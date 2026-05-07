@@ -4,10 +4,27 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="Blog" suffix=" · Phoenix Framework" phx-no-format>{assigns[:page_title]}</.live_title>
+    <.live_title default="DevWrite" phx-no-format>{assigns[:page_title]}</.live_title>
+
+    <%!-- Google Fonts: Inter (UI) + Newsreader (prose) --%>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Newsreader:wght@400&display=swap"
+    />
+
+    <%!-- Material Symbols Outlined (icons used in the design) --%>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
+    />
+
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
+
+    <%!-- Apply saved theme before first paint to avoid flash --%>
     <script>
       (() => {
         const setTheme = (theme) => {
@@ -23,12 +40,31 @@
           setTheme(localStorage.getItem("phx:theme") || "system");
         }
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
-        
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
     </script>
   </head>
-  <body>
+  <body class="bg-surface text-on-surface font-ui-body text-ui-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col">
+    <ul class="menu menu-horizontal w-full relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+      <%= if @current_scope do %>
+        <li>
+          {@current_scope.user.email}
+        </li>
+        <li>
+          <.link href={~p"/users/settings"}>Settings</.link>
+        </li>
+        <li>
+          <.link href={~p"/users/log-out"} method="delete">Log out</.link>
+        </li>
+      <% else %>
+        <li>
+          <.link href={~p"/users/register"}>Register</.link>
+        </li>
+        <li>
+          <.link href={~p"/users/log-in"}>Log in</.link>
+        </li>
+      <% end %>
+    </ul>
     {@inner_content}
   </body>
 </html>
