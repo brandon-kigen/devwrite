@@ -7,6 +7,19 @@
 # General application configuration
 import Config
 
+config :blog, :scopes,
+  user: [
+    default: true,
+    module: Blog.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :id,
+    schema_table: :users,
+    test_data_fixture: Blog.AccountsFixtures,
+    test_setup_helper: :register_and_log_in_user
+  ]
+
 config :blog,
   ecto_repos: [Blog.Repo],
   generators: [timestamp_type: :utc_datetime]
@@ -21,6 +34,8 @@ config :blog, BlogWeb.Endpoint,
   ],
   pubsub_server: Blog.PubSub,
   live_view: [signing_salt: "+L8RkCaW"]
+
+config :blog, Blog.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,
