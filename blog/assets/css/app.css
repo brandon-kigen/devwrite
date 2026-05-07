@@ -10,17 +10,12 @@
    The heroicons installation itself is managed by your mix.exs */
 @plugin "../vendor/heroicons";
 
-/* daisyUI Tailwind Plugin. You can update this file by fetching the latest version with:
-   curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
-   Make sure to look at the daisyUI changelog: https://daisyui.com/docs/changelog/ */
+/* daisyUI Tailwind Plugin. */
 @plugin "../vendor/daisyui" {
   themes: false;
 }
 
-/* daisyUI theme plugin. You can update this file by fetching the latest version with:
-  curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui-theme.js
-  We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
-  on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
+/* ─── DaisyUI dark theme ────────────────────────────────────────────────────── */
 @plugin "../vendor/daisyui-theme" {
   name: "dark";
   default: false;
@@ -56,31 +51,36 @@
   --noise: 0;
 }
 
+/* ─── DaisyUI light theme — aligned to our MD3 design system ───────────────── */
 @plugin "../vendor/daisyui-theme" {
   name: "light";
   default: true;
   prefersdark: false;
   color-scheme: "light";
-  --color-base-100: oklch(98% 0 0);
-  --color-base-200: oklch(96% 0.001 286.375);
-  --color-base-300: oklch(92% 0.004 286.32);
-  --color-base-content: oklch(21% 0.006 285.885);
-  --color-primary: oklch(70% 0.213 47.604);
-  --color-primary-content: oklch(98% 0.016 73.684);
-  --color-secondary: oklch(55% 0.027 264.364);
-  --color-secondary-content: oklch(98% 0.002 247.839);
-  --color-accent: oklch(0% 0 0);
-  --color-accent-content: oklch(100% 0 0);
-  --color-neutral: oklch(44% 0.017 285.786);
-  --color-neutral-content: oklch(98% 0 0);
+  /* Base surface colours */
+  --color-base-100: #fdf7ff;
+  --color-base-200: #f2ecf4;
+  --color-base-300: #e6e0e9;
+  --color-base-content: #1d1b20;
+  /* Brand */
+  --color-primary: #4f378a;
+  --color-primary-content: #ffffff;
+  --color-secondary: #63597c;
+  --color-secondary-content: #ffffff;
+  --color-accent: #f05032;
+  --color-accent-content: #ffffff;
+  --color-neutral: #7a7582;
+  --color-neutral-content: #ffffff;
+  /* Semantic */
   --color-info: oklch(62% 0.214 259.815);
   --color-info-content: oklch(97% 0.014 254.604);
   --color-success: oklch(70% 0.14 182.503);
   --color-success-content: oklch(98% 0.014 180.72);
   --color-warning: oklch(66% 0.179 58.318);
   --color-warning-content: oklch(98% 0.022 95.277);
-  --color-error: oklch(58% 0.253 17.585);
-  --color-error-content: oklch(96% 0.015 12.422);
+  --color-error: #ba1a1a;
+  --color-error-content: #ffffff;
+  /* Shape */
   --radius-selector: 0.25rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;
@@ -91,15 +91,162 @@
   --noise: 0;
 }
 
-/* Add variants based on LiveView classes */
+/* ─── Material Design 3 extended colour tokens ──────────────────────────────── */
+/* These are the tokens the design uses that DaisyUI doesn't cover.             */
+/* They live in @theme so Tailwind generates bg-*, text-*, border-* etc.        */
+@theme {
+  /* Primary family */
+  --color-on-primary: #ffffff;
+  --color-primary-container: #6750a4;
+  --color-on-primary-container: #e0d2ff;
+  --color-primary-fixed: #e9ddff;
+  --color-primary-fixed-dim: #cfbcff;
+  --color-on-primary-fixed: #22005d;
+  --color-on-primary-fixed-variant: #4f378a;
+  --color-inverse-primary: #cfbcff;
+
+  /* Secondary family */
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e1d4fd;
+  --color-on-secondary-container: #645a7d;
+  --color-secondary-fixed: #e9ddff;
+  --color-secondary-fixed-dim: #cdc0e9;
+  --color-on-secondary-fixed: #1f1635;
+  --color-on-secondary-fixed-variant: #4b4263;
+
+  /* Tertiary family */
+  --color-tertiary: #765b00;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #c9a74d;
+  --color-on-tertiary-container: #503d00;
+  --color-tertiary-fixed: #ffdf93;
+  --color-tertiary-fixed-dim: #e7c365;
+  --color-on-tertiary-fixed: #241a00;
+  --color-on-tertiary-fixed-variant: #594400;
+
+  /* Error family */
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  /* Surface family */
+  --color-surface: #fdf7ff;
+  --color-on-surface: #1d1b20;
+  --color-surface-variant: #e6e0e9;
+  --color-on-surface-variant: #494551;
+  --color-surface-dim: #ded8e0;
+  --color-surface-bright: #fdf7ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f8f2fa;
+  --color-surface-container: #f2ecf4;
+  --color-surface-container-high: #ece6ee;
+  --color-surface-container-highest: #e6e0e9;
+  --color-surface-tint: #6750a4;
+
+  /* Misc */
+  --color-on-background: #1d1b20;
+  --color-outline: #7a7582;
+  --color-outline-variant: #cbc4d2;
+  --color-inverse-surface: #322f35;
+  --color-inverse-on-surface: #f5eff7;
+
+  /* ── Custom font families ───────────────────────────────────────────────── */
+  --font-h1: "Inter", sans-serif;
+  --font-h2: "Inter", sans-serif;
+  --font-h3: "Inter", sans-serif;
+  --font-ui-body: "Inter", sans-serif;
+  --font-prose-body: "Newsreader", serif;
+  --font-code: monospace;
+  --font-ui-label: "Inter", sans-serif;
+
+  /* ── Custom spacing tokens ──────────────────────────────────────────────── */
+  /* Generates p-xs, px-md, gap-lg, max-w-container-max, etc.                 */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2.5rem;
+  --spacing-xl: 4rem;
+  --spacing-base: 4px;
+  --spacing-prose-max: 720px;
+  --spacing-container-max: 1200px;
+}
+
+/* ─── Compound typography utilities ────────────────────────────────────────── */
+/* Each bundles the font-size, line-height, and letter-spacing for a type role. */
+/* Font-weight is intentionally omitted — set it separately with font-bold etc. */
+@utility text-h1 {
+  font-size: 48px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+@utility text-h2 {
+  font-size: 32px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+@utility text-h3 {
+  font-size: 24px;
+  line-height: 1.4;
+}
+
+@utility text-ui-body {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+@utility text-prose-body {
+  font-size: 20px;
+  line-height: 1.7;
+}
+
+@utility text-code {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@utility text-ui-label {
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Auth page utilities (from design) ────────────────────────────────────── */
+@utility focus-ring {
+  transition: all 0.2s;
+  &:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px
+      color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+}
+
+@utility shadow-rest {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+@utility shadow-hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* ─── LiveView state variants ───────────────────────────────────────────────── */
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
 @custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
 
-/* Use the data attribute for dark mode  */
+/* ─── Dark mode via data-theme attribute ────────────────────────────────────── */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* Make LiveView wrapper divs transparent for layout */
-[data-phx-session], [data-phx-teleported-src] { display: contents }
+[data-phx-session],
+[data-phx-teleported-src] {
+  display: contents;
+}
 
-/* This file is for your main application CSS */
+/* ─── Push toasts below the fixed header ────────────────────────────────────── */
+/* DaisyUI's toast-top anchors at top:0, which sits under our z-50 fixed nav.   */
+/* Our header is always h-16 (4rem / 64px), so we offset by the same amount.    */
+.toast.toast-top {
+  top: 4.5rem; /* header height + a little breathing room */
+}
