@@ -1,6 +1,6 @@
-# Soliloquy
+# DevWrite
 
-A personal blog application built with Elixir, Phoenix LiveView, and PostgreSQL.
+A technical blog application built with Elixir, Phoenix LiveView, and PostgreSQL.
 
 ## Stack
 
