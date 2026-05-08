@@ -1,6 +1,8 @@
 defmodule BlogWeb.FeedLive do
   use BlogWeb, :live_view
 
+  alias Blog.Posts
+
   @impl true
   def mount(_params, _session, socket) do
     user = socket.assigns.current_scope.user
@@ -10,12 +12,19 @@ defmodule BlogWeb.FeedLive do
       |> String.first()
       |> String.upcase()
 
+    posts = Posts.list_posts()
+    # Preload like counts for each post
+    posts_with_likes = Enum.map(posts, fn post ->
+      {post, Posts.like_count(post.id)}
+    end)
+
     {:ok,
      socket
      |> assign(:page_title, "Feed — DevWrite")
      |> assign(:user_email, user.email)
      |> assign(:user_initial, user_initial)
-     |> assign(:profile_open, false)}
+     |> assign(:profile_open, false)
+     |> assign(:posts, posts_with_likes)}
   end
 
   @impl true

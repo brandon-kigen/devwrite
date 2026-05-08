@@ -53,6 +53,8 @@ defmodule BlogWeb.Router do
       live("/feed", FeedLive)
       live("/users/settings", UserLive.Settings, :edit)
       live("/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email)
+      live("/posts/new", PostLive.Form, :new)
+      live("/posts/:id/edit", PostLive.Form, :edit)
     end
 
     post("/users/update-password", UserSessionController, :update_password)
@@ -67,8 +69,10 @@ defmodule BlogWeb.Router do
       live("/users/register", UserLive.Registration, :new)
       live("/users/log-in", UserLive.Login, :new)
       live("/users/log-in/:token", UserLive.Confirmation, :new)
+      live("/posts/:id", PostLive.Show, :show)
     end
 
+    get("/posts", BlogWeb.RedirectController, :posts)
     post("/users/log-in", UserSessionController, :create)
     delete("/users/log-out", UserSessionController, :delete)
   end

@@ -37,9 +37,9 @@
 
     <%!-- Actions — authenticated state --%>
     <div class="flex items-center gap-sm">
-      <button class="font-ui-label text-ui-label font-bold bg-primary text-on-primary px-sm py-xs rounded-lg hover:shadow-md active:scale-95 transform transition-all duration-150">
+      <.link href={~p"/posts/new"} class="font-ui-label text-ui-label font-bold bg-primary text-on-primary px-sm py-xs rounded-lg hover:shadow-md active:scale-95 transform transition-all duration-150">
         New Post
-      </button>
+      </.link>
       <%!-- Profile avatar + dropdown --%>
       <div class="relative">
         <button
@@ -105,149 +105,61 @@
   <%!-- ─── Bento article grid ───────────────────────────────────────────────── --%>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
 
-    <%!-- Card 1 — Featured (large, spans 2 cols × 2 rows on desktop) --%>
-    <article class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest hover:shadow-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer group lg:col-span-2 lg:row-span-2">
-      <div class="relative h-64 lg:h-80 w-full overflow-hidden">
-        <img
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          alt="Abstract code visualization"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZl4IkJL5dnl2X2y7PVHsUTnjq9YjysPgbmYrZeiuKd_gHa_aHBPcq1Lo1RbWRBROVaJ0KjmflgK-Z1bbpnqwZGLFr4Y7jJHTrxhAU3eUQxY6Z0IhFv_JzceZsYBVwUOliUPI9bMQsOpcqV-z1TRTVkubNCKO8GbjqGSCulMhMZRBdwIE9xYvp9oV4g_YdUDu_Mus2Wnw-6wr1iwHrED3a1aaiR7xAY8T2JftJjlf5X2VjR1QU9mcZSyIZwO6JNTwdRSbhbsWQ5Hw"
-        />
-        <div class="absolute top-sm left-sm flex gap-xs">
-          <span class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider">
-            Architecture
-          </span>
-        </div>
+    <%= if Enum.empty?(@posts) do %>
+      <div class="col-span-full flex flex-col items-center justify-center py-xl">
+        <span class="material-symbols-outlined text-[48px] text-outline-variant mb-md">
+          article
+        </span>
+        <h2 class="font-h3 text-h3 text-on-surface mb-sm">No posts yet</h2>
+        <p class="font-ui-body text-ui-body text-on-surface-variant mb-lg">
+          Be the first to share your thoughts!
+        </p>
+        <.link href={~p"/posts/new"} class="btn btn-primary">
+          Write a Post
+        </.link>
       </div>
-      <div class="p-sm flex-1 flex flex-col justify-between">
-        <div>
-          <h2 class="font-h2 text-h2 font-bold text-on-surface mb-xs group-hover:text-primary transition-colors">
-            Micro-Frontends: A Practical Guide for 2024
-          </h2>
-          <p class="font-prose-body text-prose-body text-on-surface-variant line-clamp-3 mb-sm">
-            Breaking down the monolith is easier said than done. In this deep dive, we explore
-            pragmatic patterns for scaling large React applications across multiple autonomous
-            teams without sacrificing user experience or bundle size.
-          </p>
-        </div>
-        <div class="flex items-center justify-between border-t border-outline-variant/30 pt-sm mt-auto">
-          <div class="flex items-center gap-xs">
-            <img
-              class="w-6 h-6 rounded-full"
-              alt="Sarah Drasner"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtxAOMffzbTBsI4wycYM6Fcwa1pEF_AA8pjoPKwvuFIUae4EDG77m1Eje0TrYEewWqoMjitJ1Izfui89qx7StD2VQBGqfncRXRH4MOUkeub6Vop4YfOhM00MoN6oFgacQSJk_nDNLfPXg6_2bzhy_BnlMW7OOcxLzPtWb6MvjL4xoaE-4u99KiZcYH4O-Iz3RvXyyoZ_zhUUJEjgeYQuAj3d16ODctgVpc8xHULHaazomAIu-Aqb1YeViS_nyw2cTBh9oOieN5rNE"
-            />
-            <span class="font-ui-label text-ui-label font-semibold text-on-surface">Sarah Drasner</span>
-            <span class="text-outline text-[12px]">• 8 min read</span>
-          </div>
-          <span class="font-ui-label text-ui-label font-semibold text-primary flex items-center gap-[4px] group-hover:underline">
-            Read More
-            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </span>
-        </div>
-      </div>
-    </article>
-
-    <%!-- Card 2 — Data Science --%>
-    <article class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest hover:shadow-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer group">
-      <div class="relative h-48 w-full overflow-hidden">
-        <img
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          alt="Developer workspace"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBia2mnQmUt6j6beWcIhPeh8cF7Mf0MAOV-NHRU-Ky_EdkQ_KyMBWQ-uWbcFEyb8pClLdGQLiw6DBGl_rO_xmVLyyMmHTn9mLfsBbQaCFtKch_jVNSUaiCjzuIBgcJf-SsNl7nPhSjS3jGKD1bg_m-eIC-LA1ohJpm3DgM_pJ98KZGLpjD6SccM5BGbuIujzMM9GUYZbgqgdyLDdKsVWLGagvVRx_Kz3n0GwS33bMdwTiCpq7wo5YzRoDF1ojaijosQNd8HXVAorw"
-        />
-        <div class="absolute top-sm left-sm">
-          <span class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider">
-            Data Science
-          </span>
-        </div>
-      </div>
-      <div class="p-sm flex-1 flex flex-col justify-between">
-        <div>
-          <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-xs group-hover:text-primary transition-colors">
-            Optimizing Pandas DataFrames
-          </h3>
-          <p class="font-ui-body text-ui-body text-on-surface-variant line-clamp-3 mb-sm">
-            Stop using .apply(). Learn vectorization techniques that will speed up your
-            data processing pipelines by orders of magnitude.
-          </p>
-        </div>
-        <div class="flex items-center justify-between border-t border-outline-variant/30 pt-sm mt-auto">
-          <div class="flex items-center gap-xs">
-            <div class="w-6 h-6 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container font-bold text-[10px]">
-              JD
+    <% else %>
+      <%= for {post, like_count} <- @posts do %>
+        <.link href={~p"/posts/#{post.id}"} class="group">
+          <article class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest hover:shadow-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer h-full">
+            <div class="p-sm flex-1 flex flex-col justify-between bg-surface-container-low">
+              <div>
+                <div class="flex gap-xs mb-sm">
+                  <%= for topic <- post.topics do %>
+                    <span class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider">
+                      <%= topic %>
+                    </span>
+                  <% end %>
+                </div>
+                <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-xs group-hover:text-primary transition-colors line-clamp-2">
+                  <%= post.title %>
+                </h3>
+                <p class="font-ui-body text-ui-body text-on-surface-variant line-clamp-4 mb-sm">
+                  <%= String.slice(post.body, 0, 150) %>...
+                </p>
+              </div>
+              <div class="flex items-center justify-between pt-sm mt-auto">
+                <div class="flex items-center gap-xs">
+                  <div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-xs font-bold">
+                    <%= String.first(post.user.email) %>
+                  </div>
+                  <span class="font-ui-label text-ui-label font-semibold text-on-surface">
+                    <%= String.split(post.user.email, "@") |> List.first() %>
+                  </span>
+                  <span class="text-outline text-[12px]">
+                    <%= Calendar.strftime(post.published_at || post.inserted_at, "%b %d") %>
+                  </span>
+                </div>
+                <span class="text-outline text-[12px] flex items-center gap-xs">
+                  <span class="material-symbols-outlined text-[14px]">favorite</span>
+                  <%= like_count %>
+                </span>
+              </div>
             </div>
-            <span class="font-ui-label text-ui-label font-semibold text-on-surface">John Doe</span>
-          </div>
-        </div>
-      </div>
-    </article>
-
-    <%!-- Card 3 — Security (text-only, no image) --%>
-    <article class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest hover:shadow-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer group">
-      <div class="p-sm flex-1 flex flex-col justify-between bg-surface-container-low">
-        <div>
-          <div class="flex gap-xs mb-sm">
-            <span class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider">
-              Security
-            </span>
-          </div>
-          <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-xs group-hover:text-primary transition-colors">
-            Zero Trust Architecture Explained
-          </h3>
-          <p class="font-ui-body text-ui-body text-on-surface-variant line-clamp-4 mb-sm">
-            Why the traditional perimeter security model is dead, and how to implement
-            identity-aware proxies in your infrastructure.
-          </p>
-        </div>
-        <div class="flex items-center justify-between pt-sm mt-auto">
-          <div class="flex items-center gap-xs">
-            <img
-              class="w-6 h-6 rounded-full"
-              alt="Alex Chen"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY7sIoMivqItuOpyQ880zcHBTv3EprkSgCweLaSz_lEbNagD61GBnnhpwpBOC15L8bgFPTSKiBOY7NBH3l3wXlyTdkRdch7SRT5BoOwtamHQBg8M7VjU4hSe1Mt0FnCq8_gn3Tw0ophnk4q9V8jrWuI84ilOIizs3gw9PASaUtW63TBE6dWrtLNnH0vx4Ow3tf4fcIIsSPhdLm5Eiiv2c_Knbrqc3T8eu0UQ-5_PbYcuw9L4NExBROLfbdUs3s6IHUj_2521PHltY"
-            />
-            <span class="font-ui-label text-ui-label font-semibold text-on-surface">Alex Chen</span>
-          </div>
-          <span class="text-outline text-[12px]">5 min read</span>
-        </div>
-      </div>
-    </article>
-
-    <%!-- Card 4 — Design Systems --%>
-    <article class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest hover:shadow-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer group">
-      <div class="relative h-48 w-full overflow-hidden">
-        <img
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          alt="UI design tokens"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4ZKTLRo8rOanaENrenUWUVJzmIgrJZlSQXdqbPXcz4OKMq38EU50wuFmECDYMTNmoUZZVRfktTB-3MRgFph7X_cmSeoRhFXmx8PpBxq6iNo8AneyAbhxNfYv8pGnr9OTzyULSUrmTW2wI80DqhNlybLOMd2gGzaSVBSXO7DnLm8s207iAJbFHXgLliHmzwyKprWxR7_cqCeHE0vwEqiBXikTb4xEsbNbyh7epuUOviTuFuJi9pYVXaMG31dmjEaPI4kv1kmb2NgM"
-        />
-        <div class="absolute top-sm left-sm">
-          <span class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider">
-            Design Systems
-          </span>
-        </div>
-      </div>
-      <div class="p-sm flex-1 flex flex-col justify-between">
-        <div>
-          <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-xs group-hover:text-primary transition-colors">
-            Design Tokens in Practice
-          </h3>
-          <p class="font-ui-body text-ui-body text-on-surface-variant line-clamp-3 mb-sm">
-            Bridging the gap between Figma and code using standardized JSON structures
-            for typography, color, and spacing.
-          </p>
-        </div>
-        <div class="flex items-center justify-between border-t border-outline-variant/30 pt-sm mt-auto">
-          <div class="flex items-center gap-xs">
-            <div class="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-[10px]">
-              EW
-            </div>
-            <span class="font-ui-label text-ui-label font-semibold text-on-surface">Emma Wright</span>
-          </div>
-        </div>
-      </div>
-    </article>
+          </article>
+        </.link>
+      <% end %>
+    <% end %>
 
   </div>
 </main>

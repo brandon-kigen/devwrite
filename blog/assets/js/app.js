@@ -25,11 +25,46 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/blog"
 import topbar from "../vendor/topbar"
 
+// ═══════════════════════════════════════════════════════════════════════════
+// Custom Hooks
+// ═══════════════════════════════════════════════════════════════════════════
+
+const CommentsVisibility = {
+  mounted() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          this.pushEvent("load_comments", {});
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.1 });
+
+    observer.observe(this.el);
+  },
+};
+
+const FocusCommentBox = {
+  mounted() {
+    this.handleEvent("focus-comment-box", () => {
+      const textarea = document.getElementById("comment-textarea");
+      if (textarea) {
+        textarea.scrollIntoView({ behavior: "smooth", block: "center" });
+        textarea.focus();
+      }
+    });
+  },
+};
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {
+    ...colocatedHooks,
+    CommentsVisibility,
+    FocusCommentBox,
+  },
 })
 
 // Show progress bar on live navigation and form submits
