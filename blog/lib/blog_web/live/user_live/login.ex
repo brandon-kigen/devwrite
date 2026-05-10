@@ -248,7 +248,4 @@ defmodule BlogWeb.UserLive.Login do
      |> push_navigate(to: ~p"/users/log-in")}
   end
 
-  defp local_mail_adapter? do
-    Application.get_env(:blog, Blog.Mailer)[:adapter] == Swoosh.Adapters.Local
-  end
 end

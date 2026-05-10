@@ -152,11 +152,13 @@ defmodule Blog.Posts do
   Creates a comment for a post by a user and broadcasts it via PubSub.
   """
   def create_comment(%User{} = user, post_id, attrs \\ %{}) do
-    attrs = Map.put(attrs, "post_id", post_id)
+    attrs = 
+      attrs
+      |> Map.put("post_id", post_id)
+      |> Map.put("user_id", user.id)
 
     %Comment{}
     |> Comment.changeset(attrs)
-    |> Ecto.Changeset.put_assoc(:user, user)
     |> Repo.insert()
     |> case do
       {:ok, comment} ->

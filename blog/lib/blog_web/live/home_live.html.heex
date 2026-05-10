@@ -3,17 +3,20 @@
 <%!-- ═══ Fixed Navigation Header ═══════════════════════════════════════════════ --%>
 <header class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md shadow-sm">
   <nav class="flex justify-between items-center max-w-container-max mx-auto px-md h-16">
-
     <%!-- Brand --%>
     <div class="flex-shrink-0 flex items-center gap-2">
       <span
         class="material-symbols-outlined text-primary text-3xl"
         style='font-variation-settings: "FILL" 1'
-      >terminal</span>
+      >
+        terminal
+      </span>
       <a
         class="font-h3 text-[24px] leading-[1.4] font-black text-primary tracking-tight"
         href={~p"/"}
-      >DevWrite</a>
+      >
+        DevWrite
+      </a>
     </div>
 
     <%!-- Desktop navigation links --%>
@@ -21,15 +24,21 @@
       <a
         class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg px-sm py-xs transition-colors duration-200"
         href="#"
-      >Explore</a>
+      >
+        Explore
+      </a>
       <a
         class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg px-sm py-xs transition-colors duration-200"
         href="/feed"
-      >Feed</a>
+      >
+        Feed
+      </a>
       <a
         class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg px-sm py-xs transition-colors duration-200"
         href="#"
-      >Communities</a>
+      >
+        Communities
+      </a>
     </div>
 
     <%!-- Desktop actions: search + auth buttons + mobile toggle --%>
@@ -46,12 +55,16 @@
       <a
         class="font-ui-label text-ui-label font-bold text-primary hover:bg-primary-container/10 px-sm py-xs rounded-lg transition-all duration-200"
         href={~p"/users/log-in"}
-      >Log In</a>
+      >
+        Log In
+      </a>
 
       <a
         class="font-ui-label text-ui-label font-bold bg-[#F05032] text-white px-sm py-xs rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-150"
         href={~p"/users/register"}
-      >Sign Up</a>
+      >
+        Sign Up
+      </a>
 
       <%!-- Mobile menu toggle --%>
       <button
@@ -60,7 +73,7 @@
         aria-label="Toggle navigation menu"
       >
         <span class="material-symbols-outlined">
-          <%= if @menu_open, do: "close", else: "menu" %>
+          {if @menu_open, do: "close", else: "menu"}
         </span>
       </button>
     </div>
@@ -71,29 +84,53 @@
     :if={@menu_open}
     class="md:hidden bg-surface border-t border-outline-variant px-md py-sm flex flex-col gap-xs"
   >
-    <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary py-xs" href="#">Explore</a>
-    <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary py-xs" href="/feed">Feed</a>
-    <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary py-xs" href="#">Communities</a>
+    <a
+      class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary py-xs"
+      href="#"
+    >
+      Explore
+    </a>
+    <a
+      class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary py-xs"
+      href="/feed"
+    >
+      Feed
+    </a>
+    <a
+      class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary py-xs"
+      href="#"
+    >
+      Communities
+    </a>
     <div class="flex items-center gap-md pt-xs border-t border-outline-variant mt-xs">
-      <a class="font-ui-label text-ui-label font-bold text-primary" href={~p"/users/log-in"}>Log In</a>
-      <a class="font-ui-label text-ui-label font-bold bg-[#F05032] text-white px-sm py-xs rounded-lg" href={~p"/users/register"}>Sign Up</a>
+      <a class="font-ui-label text-ui-label font-bold text-primary" href={~p"/users/log-in"}>
+        Log In
+      </a>
+      <a
+        class="font-ui-label text-ui-label font-bold bg-[#F05032] text-white px-sm py-xs rounded-lg"
+        href={~p"/users/register"}
+      >
+        Sign Up
+      </a>
     </div>
   </div>
 </header>
 
 <%!-- ═══ Main Content ═══════════════════════════════════════════════════════════ --%>
 <main class="flex-grow pt-24 pb-xl">
-
   <%!-- ─── Hero Section ─────────────────────────────────────────────────────── --%>
   <section class="max-w-container-max mx-auto px-md py-xl md:py-20 text-center flex flex-col items-center">
-
     <%!-- Badge --%>
     <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high border border-outline-variant mb-8">
       <span
         class="material-symbols-outlined text-primary text-sm"
         style='font-variation-settings: "FILL" 1'
-      >bolt</span>
-      <span class="font-ui-label text-ui-label font-semibold text-on-surface-variant">v2.0 is now live</span>
+      >
+        bolt
+      </span>
+      <span class="font-ui-label text-ui-label font-semibold text-on-surface-variant">
+        v2.0 is now live
+      </span>
     </div>
 
     <%!-- Headline --%>
@@ -127,8 +164,7 @@
         class="w-full sm:w-auto font-ui-label text-ui-label font-bold bg-surface-container text-on-surface px-8 py-4 rounded-lg border border-outline-variant hover:border-primary hover:text-primary transition-colors duration-200 flex items-center justify-center gap-2"
         href="#preview"
       >
-        <span class="material-symbols-outlined text-sm">code</span>
-        View Examples
+        <span class="material-symbols-outlined text-sm">code</span> View Examples
       </a>
     </div>
   </section>
@@ -136,14 +172,15 @@
   <%!-- ─── Bento Grid Features ───────────────────────────────────────────────── --%>
   <section class="max-w-container-max mx-auto px-md py-xl">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
       <%!-- Lightning Fast --%>
       <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col items-start group">
         <div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center mb-6 group-hover:bg-primary-container/20 transition-colors">
           <span
             class="material-symbols-outlined text-primary text-2xl"
             style='font-variation-settings: "FILL" 1'
-          >speed</span>
+          >
+            speed
+          </span>
         </div>
         <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-3">Lightning Fast</h3>
         <p class="font-ui-body text-ui-body text-on-surface-variant">
@@ -158,7 +195,9 @@
           <span
             class="material-symbols-outlined text-primary text-2xl"
             style='font-variation-settings: "FILL" 1'
-          >group_work</span>
+          >
+            group_work
+          </span>
         </div>
         <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-3">Vibrant Community</h3>
         <p class="font-ui-body text-ui-body text-on-surface-variant">
@@ -174,7 +213,9 @@
           <span
             class="material-symbols-outlined text-primary text-2xl"
             style='font-variation-settings: "FILL" 1'
-          >auto_awesome</span>
+          >
+            auto_awesome
+          </span>
         </div>
         <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-3">Radical Simplicity</h3>
         <p class="font-ui-body text-ui-body text-on-surface-variant">
@@ -182,7 +223,6 @@
           way, letting you focus purely on articulating complex technical concepts clearly.
         </p>
       </div>
-
     </div>
   </section>
 
@@ -205,14 +245,12 @@
         class="hidden md:flex font-ui-label text-ui-label font-semibold text-primary hover:underline items-center gap-1"
         href="#"
       >
-        View all posts
-        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        View all posts <span class="material-symbols-outlined text-sm">arrow_forward</span>
       </a>
     </div>
 
     <%!-- Article cards --%>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
       <%!-- Card 1 — Architecture --%>
       <article class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col">
         <img
@@ -222,8 +260,12 @@
         />
         <div class="p-6 flex flex-col flex-grow">
           <div class="flex gap-2 mb-3">
-            <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-primary px-2 py-1 rounded">ARCHITECTURE</span>
-            <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-on-surface-variant px-2 py-1 rounded">5 MIN READ</span>
+            <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-primary px-2 py-1 rounded">
+              ARCHITECTURE
+            </span>
+            <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-on-surface-variant px-2 py-1 rounded">
+              5 MIN READ
+            </span>
           </div>
           <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-2 hover:text-primary transition-colors cursor-pointer">
             Building Resilient Microservices
@@ -238,7 +280,9 @@
             </div>
             <div>
               <p class="font-ui-label text-ui-label font-semibold text-on-surface">Jane Smith</p>
-              <p class="font-ui-body text-[12px] text-on-surface-variant">Senior Staff Engineer</p>
+              <p class="font-ui-body text-[12px] text-on-surface-variant">
+                Senior Staff Engineer
+              </p>
             </div>
           </div>
         </div>
@@ -253,8 +297,12 @@
         />
         <div class="p-6 flex flex-col flex-grow">
           <div class="flex gap-2 mb-3">
-            <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-primary px-2 py-1 rounded">PERFORMANCE</span>
-            <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-on-surface-variant px-2 py-1 rounded">8 MIN READ</span>
+            <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-primary px-2 py-1 rounded">
+              PERFORMANCE
+            </span>
+            <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-on-surface-variant px-2 py-1 rounded">
+              8 MIN READ
+            </span>
           </div>
           <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-2 hover:text-primary transition-colors cursor-pointer">
             Optimizing React Context
@@ -274,7 +322,6 @@
           </div>
         </div>
       </article>
-
     </div>
 
     <%!-- Mobile "View all" link --%>
@@ -285,20 +332,39 @@
       View all posts
     </a>
   </section>
-
 </main>
 
 <%!-- ═══ Footer ════════════════════════════════════════════════════════════════ --%>
 <footer class="w-full bg-surface-container-lowest border-t border-outline-variant">
   <div class="max-w-container-max mx-auto px-md py-lg flex flex-col md:flex-row justify-between items-center gap-sm">
     <span class="font-ui-label text-ui-label font-bold text-primary">
-      &copy; 2024 DevWrite. Crafted for the modern engineer.
+      &copy; {Date.utc_today().year} DevWrite. Crafted for the modern engineer.
     </span>
     <div class="flex flex-wrap justify-center gap-md">
-      <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Changelog</a>
-      <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">API Docs</a>
-      <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
-      <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Code of Conduct</a>
+      <a
+        class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+        href="#"
+      >
+        Changelog
+      </a>
+      <a
+        class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+        href="#"
+      >
+        API Docs
+      </a>
+      <a
+        class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+        href="#"
+      >
+        Privacy Policy
+      </a>
+      <a
+        class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+        href="#"
+      >
+        Code of Conduct
+      </a>
     </div>
   </div>
 </footer>

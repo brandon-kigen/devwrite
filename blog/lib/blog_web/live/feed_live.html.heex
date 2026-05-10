@@ -3,10 +3,12 @@
 <%!-- ═══ Fixed Navigation Header ════════════════════════════════════════════ --%>
 <header class="bg-surface/95 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm">
   <div class="flex justify-between items-center max-w-container-max mx-auto px-md h-16">
-
     <%!-- Brand + search --%>
     <div class="flex items-center gap-sm">
-      <a href={~p"/"} class="font-h3 text-[24px] leading-[1.4] font-black text-primary tracking-tight">
+      <a
+        href={~p"/"}
+        class="font-h3 text-[24px] leading-[1.4] font-black text-primary tracking-tight"
+      >
         DevWrite
       </a>
       <div class="hidden md:flex items-center bg-surface-variant/50 rounded-full px-xs py-[4px] border border-outline-variant/30">
@@ -24,20 +26,29 @@
       <a
         class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-all duration-200 px-sm py-xs"
         href="#"
-      >Explore</a>
+      >
+        Explore
+      </a>
       <a
         class="font-ui-label text-ui-label font-semibold text-primary border-b-2 border-primary pb-1 hover:bg-primary-container/10 rounded-lg transition-all duration-200 px-sm py-xs"
         href={~p"/feed"}
-      >Feed</a>
+      >
+        Feed
+      </a>
       <a
         class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-all duration-200 px-sm py-xs"
         href="#"
-      >Communities</a>
+      >
+        Communities
+      </a>
     </nav>
 
     <%!-- Actions — authenticated state --%>
     <div class="flex items-center gap-sm">
-      <.link href={~p"/posts/new"} class="font-ui-label text-ui-label font-bold bg-primary text-on-primary px-sm py-xs rounded-lg hover:shadow-md active:scale-95 transform transition-all duration-150">
+      <.link
+        href={~p"/posts/new"}
+        class="font-ui-label text-ui-label font-bold bg-primary text-on-primary px-sm py-xs rounded-lg hover:shadow-md active:scale-95 transform transition-all duration-150"
+      >
         New Post
       </.link>
       <%!-- Profile avatar + dropdown --%>
@@ -58,19 +69,29 @@
         >
           <%!-- Account info --%>
           <div class="px-sm py-xs border-b border-outline-variant">
-            <p class="font-ui-label text-[11px] font-semibold text-outline uppercase tracking-wider mb-[2px]">Signed in as</p>
+            <p class="font-ui-label text-[11px] font-semibold text-outline uppercase tracking-wider mb-[2px]">
+              Signed in as
+            </p>
             <p class="font-ui-body text-ui-body text-on-surface truncate">{@user_email}</p>
           </div>
 
           <%!-- Actions --%>
           <div class="py-xs">
             <.link
+              href={~p"/users/profile"}
+              class="flex items-center gap-xs px-sm py-xs w-full font-ui-label text-ui-label font-semibold text-on-surface-variant hover:bg-primary-container/10 hover:text-primary transition-colors"
+            >
+              <span class="material-symbols-outlined text-[18px]">person</span> Profile
+            </.link>
+          </div>
+
+          <div class="py-xs border-t border-outline-variant">
+            <.link
               href={~p"/users/log-out"}
               method="delete"
               class="flex items-center gap-xs px-sm py-xs w-full font-ui-label text-ui-label font-semibold text-on-surface-variant hover:bg-error-container hover:text-error transition-colors"
             >
-              <span class="material-symbols-outlined text-[18px]">logout</span>
-              Log out
+              <span class="material-symbols-outlined text-[18px]">logout</span> Log out
             </.link>
           </div>
         </div>
@@ -80,8 +101,7 @@
 </header>
 
 <%!-- ═══ Main Content ══════════════════════════════════════════════════════════ --%>
-<main class="max-w-container-max mx-auto px-md pt-[104px] pb-xl">
-
+<main class="flex-grow max-w-container-max mx-auto px-md pt-[104px] pb-xl w-full">
   <%!-- ─── Page heading + filter controls ──────────────────────────────────── --%>
   <section class="mb-lg flex flex-col md:flex-row gap-md items-end justify-between">
     <div>
@@ -92,19 +112,16 @@
     </div>
     <div class="flex gap-xs">
       <button class="bg-surface-container text-primary font-ui-label text-ui-label font-semibold px-sm py-[6px] rounded-full border border-outline-variant hover:bg-surface-variant transition-colors flex items-center gap-[4px]">
-        <span class="material-symbols-outlined text-[18px]">filter_list</span>
-        Filter
+        <span class="material-symbols-outlined text-[18px]">filter_list</span> Filter
       </button>
       <button class="bg-surface-container text-primary font-ui-label text-ui-label font-semibold px-sm py-[6px] rounded-full border border-outline-variant hover:bg-surface-variant transition-colors flex items-center gap-[4px]">
-        <span class="material-symbols-outlined text-[18px]">sort</span>
-        Top
+        <span class="material-symbols-outlined text-[18px]">sort</span> Top
       </button>
     </div>
   </section>
 
   <%!-- ─── Bento article grid ───────────────────────────────────────────────── --%>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
-
     <%= if Enum.empty?(@posts) do %>
       <div class="col-span-full flex flex-col items-center justify-center py-xl">
         <span class="material-symbols-outlined text-[48px] text-outline-variant mb-md">
@@ -127,32 +144,32 @@
                 <div class="flex gap-xs mb-sm">
                   <%= for topic <- post.topics do %>
                     <span class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider">
-                      <%= topic %>
+                      {topic}
                     </span>
                   <% end %>
                 </div>
                 <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-xs group-hover:text-primary transition-colors line-clamp-2">
-                  <%= post.title %>
+                  {post.title}
                 </h3>
                 <p class="font-ui-body text-ui-body text-on-surface-variant line-clamp-4 mb-sm">
-                  <%= String.slice(post.body, 0, 150) %>...
+                  {String.slice(post.body, 0, 150)}...
                 </p>
               </div>
               <div class="flex items-center justify-between pt-sm mt-auto">
                 <div class="flex items-center gap-xs">
                   <div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-xs font-bold">
-                    <%= String.first(post.user.email) %>
+                    {String.first(post.user.email)}
                   </div>
                   <span class="font-ui-label text-ui-label font-semibold text-on-surface">
-                    <%= String.split(post.user.email, "@") |> List.first() %>
+                    {String.split(post.user.email, "@") |> List.first()}
                   </span>
                   <span class="text-outline text-[12px]">
-                    <%= Calendar.strftime(post.published_at || post.inserted_at, "%b %d") %>
+                    {Calendar.strftime(post.published_at || post.inserted_at, "%b %d")}
                   </span>
                 </div>
                 <span class="text-outline text-[12px] flex items-center gap-xs">
-                  <span class="material-symbols-outlined text-[14px]">favorite</span>
-                  <%= like_count %>
+                  <span class="material-symbols-outlined text-[14px]">visibility</span>
+                  {post.view_count}
                 </span>
               </div>
             </div>
@@ -160,21 +177,40 @@
         </.link>
       <% end %>
     <% end %>
-
   </div>
 </main>
 
 <%!-- ═══ Footer ══════════════════════════════════════════════════════════════ --%>
-<footer class="w-full border-t border-outline-variant bg-surface-container-lowest mt-xl">
+<footer class="w-full border-t border-outline-variant bg-surface-container-lowest">
   <div class="max-w-container-max mx-auto px-md py-lg flex flex-col md:flex-row justify-between items-center gap-sm">
     <span class="font-ui-body text-ui-body text-on-surface-variant opacity-80 hover:opacity-100 transition-opacity">
-      &copy; 2024 DevWrite. Crafted for the modern engineer.
+      &copy; {Date.utc_today().year} DevWrite. Crafted for the modern engineer.
     </span>
     <nav class="flex gap-md">
-      <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Changelog</a>
-      <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">API Docs</a>
-      <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
-      <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Code of Conduct</a>
+      <a
+        class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+        href="#"
+      >
+        Changelog
+      </a>
+      <a
+        class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+        href="#"
+      >
+        API Docs
+      </a>
+      <a
+        class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+        href="#"
+      >
+        Privacy Policy
+      </a>
+      <a
+        class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"
+        href="#"
+      >
+        Code of Conduct
+      </a>
     </nav>
   </div>
 </footer>

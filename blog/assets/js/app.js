@@ -29,8 +29,9 @@ import topbar from "../vendor/topbar"
 // Custom Hooks
 // ═══════════════════════════════════════════════════════════════════════════
 
-const CommentsVisibility = {
+const CommentsManager = {
   mounted() {
+    // Lazy loading logic
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -41,18 +42,41 @@ const CommentsVisibility = {
     }, { threshold: 0.1 });
 
     observer.observe(this.el);
-  },
-};
 
-const FocusCommentBox = {
-  mounted() {
+    // Focus and Reset logic
     this.handleEvent("focus-comment-box", () => {
       const textarea = document.getElementById("comment-textarea");
       if (textarea) {
         textarea.scrollIntoView({ behavior: "smooth", block: "center" });
         textarea.focus();
+      } else {
+        // If not logged in, scroll to the comments section (where the login prompt is)
+        const section = document.getElementById("comments-section");
+        if (section) {
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       }
     });
+
+    this.handleEvent("reset-comment-form", () => {
+      const textarea = document.getElementById("comment-textarea");
+      if (textarea) {
+        textarea.value = "";
+      }
+    });
+  },
+};
+
+// ViewTracker: fires record_view only after user has been on the page for 60s.
+// This prevents bot/reload inflation — the server no longer increments on connect.
+const ViewTracker = {
+  mounted() {
+    this._timer = setTimeout(() => {
+      this.pushEvent("record_view", {});
+    }, 60_000); // 60 seconds
+  },
+  destroyed() {
+    clearTimeout(this._timer);
   },
 };
 
@@ -62,8 +86,8 @@ const liveSocket = new LiveSocket("/live", Socket, {
   params: {_csrf_token: csrfToken},
   hooks: {
     ...colocatedHooks,
-    CommentsVisibility,
-    FocusCommentBox,
+    CommentsManager,
+    ViewTracker,
   },
 })
 

@@ -148,6 +148,7 @@ defmodule BlogWeb.Router do
       live("/feed", FeedLive)
       live("/users/settings", UserLive.Settings, :edit)
       live("/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email)
+      live("/users/profile", UserLive.Profile)
       live("/posts/new", PostLive.Form, :new)
       live("/posts/:id/edit", PostLive.Form, :edit)
     end
@@ -168,7 +169,7 @@ defmodule BlogWeb.Router do
       live("/posts/:id", PostLive.Show, :show)
     end
 
-    get("/posts", BlogWeb.RedirectController, :posts)
+    get("/posts", RedirectController, :posts)
     post("/users/log-in", UserSessionController, :create)
     delete("/users/log-out", UserSessionController, :delete)
   end

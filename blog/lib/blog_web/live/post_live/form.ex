@@ -277,12 +277,18 @@ defmodule BlogWeb.PostLive.Form do
     <header class="bg-surface/95 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm">
       <div class="flex justify-between items-center max-w-container-max mx-auto px-md h-16">
         <div class="flex items-center gap-sm">
-          <.link href={~p"/"} class="font-h3 text-[24px] leading-[1.4] font-black text-primary tracking-tight">
+          <.link
+            href={~p"/"}
+            class="font-h3 text-[24px] leading-[1.4] font-black text-primary tracking-tight"
+          >
             DevWrite
           </.link>
         </div>
         <div class="flex items-center gap-sm">
-          <.link href={~p"/feed"} class="font-ui-label text-ui-label text-on-surface-variant hover:text-primary transition-colors">
+          <.link
+            href={~p"/feed"}
+            class="font-ui-label text-ui-label text-on-surface-variant hover:text-primary transition-colors"
+          >
             Cancel
           </.link>
         </div>
@@ -294,7 +300,7 @@ defmodule BlogWeb.PostLive.Form do
       <div class="max-w-2xl mx-auto px-md">
         <div class="mb-lg">
           <h1 class="font-h1 text-h1 text-on-surface mb-sm">
-            <%= if @live_action == :new, do: "Write a New Post", else: "Edit Post" %>
+            {if @live_action == :new, do: "Write a New Post", else: "Edit Post"}
           </h1>
           <p class="font-ui-body text-ui-body text-on-surface-variant">
             Share your thoughts and insights with the community
@@ -323,7 +329,7 @@ defmodule BlogWeb.PostLive.Form do
                 />
                 <%= if @changeset.errors[:title] do %>
                   <span class="text-error font-ui-label text-ui-label text-xs mt-xs block">
-                    <%= elem(@changeset.errors[:title], 0) %>
+                    {elem(@changeset.errors[:title], 0)}
                   </span>
                 <% end %>
               </div>
@@ -344,7 +350,7 @@ defmodule BlogWeb.PostLive.Form do
                 </textarea>
                 <%= if @changeset.errors[:body] do %>
                   <span class="text-error font-ui-label text-ui-label text-xs mt-xs block">
-                    <%= elem(@changeset.errors[:body], 0) %>
+                    {elem(@changeset.errors[:body], 0)}
                   </span>
                 <% end %>
               </div>
@@ -362,7 +368,9 @@ defmodule BlogWeb.PostLive.Form do
                   placeholder="Separate topics with commas (e.g., Elixir, Phoenix, Web)"
                   class="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface text-on-surface font-ui-body text-ui-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 />
-                <p class="text-xs text-on-surface-variant mt-xs">Topics help readers find your post</p>
+                <p class="text-xs text-on-surface-variant mt-xs">
+                  Topics help readers find your post
+                </p>
               </div>
 
               <%!-- Publish Controls --%>
@@ -392,14 +400,17 @@ defmodule BlogWeb.PostLive.Form do
 
           <%!-- Action Buttons --%>
           <div class="flex justify-between items-center">
-            <.link href={~p"/posts"} class="font-ui-label text-ui-label text-on-surface-variant hover:text-on-surface transition-colors">
+            <.link
+              href={~p"/feed"}
+              class="font-ui-label text-ui-label text-on-surface-variant hover:text-on-surface transition-colors"
+            >
               ← Back
             </.link>
             <button
               type="submit"
               class="btn btn-primary font-ui-label text-ui-label font-bold px-lg py-sm"
             >
-              <%= if @live_action == :new, do: "Publish Post", else: "Save Changes" %>
+              {if @live_action == :new, do: "Publish Post", else: "Save Changes"}
             </button>
           </div>
         </form>
