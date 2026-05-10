@@ -33,7 +33,8 @@ config :blog, BlogWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Blog.PubSub,
-  live_view: [signing_salt: "+L8RkCaW"]
+  # Set in runtime.exs
+  live_view: [signing_salt: nil]
 
 config :blog, Blog.Mailer, adapter: Swoosh.Adapters.Local
 

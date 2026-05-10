@@ -20,7 +20,14 @@ if System.get_env("PHX_SERVER") do
   config :blog, BlogWeb.Endpoint, server: true
 end
 
-config :blog, BlogWeb.Endpoint, http: [port: String.to_integer(System.get_env("PORT", "4000"))]
+# Session and LiveView salts - can be overridden via env vars
+signing_salt = System.get_env("SESSION_SIGNING_SALT") || "mCnlGDzm"
+live_view_salt = System.get_env("LIVE_VIEW_SIGNING_SALT") || "+L8RkCaW"
+
+config :blog, BlogWeb.Endpoint,
+  http: [port: String.to_integer(System.get_env("PORT", "4000"))],
+  signing_salt: signing_salt,
+  live_view: [signing_salt: live_view_salt]
 
 if config_env() == :prod do
   database_url =
@@ -45,4 +52,18 @@ if config_env() == :prod do
     url: [host: host, port: 443, scheme: "https"],
     http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: port],
     secret_key_base: secret_key_base
+
+  # Mailer configuration for production
+  # Using SMTP by default as it is widely supported
+  if System.get_env("SMTP_RELAY") do
+    config :blog, Blog.Mailer,
+      adapter: Swoosh.Adapters.SMTP,
+      relay: System.get_env("SMTP_RELAY"),
+      username: System.get_env("SMTP_USERNAME"),
+      password: System.get_env("SMTP_PASSWORD"),
+      ssl: true,
+      port: 587
+  end
+
+  config :blog, :mail, from: System.get_env("MAILER_FROM") || "contact@example.com"
 end

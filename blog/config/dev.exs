@@ -3,7 +3,7 @@ import Config
 # Configure your database
 config :blog, Blog.Repo,
   username: "postgres",
-  password: "postgres",
+  password: System.get_env("POSTGRES_PASSWORD") || "postgres",
   hostname: "localhost",
   port: 5433,
   database: "blog_dev",
@@ -24,7 +24,9 @@ config :blog, BlogWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "AzSYdvZj1lvYKuQD4ejEVHeo1FyMMflbzNw4Hhn7yDQ6AKithgnhJnNNJQgOFhQl",
+  secret_key_base:
+    System.get_env("SECRET_KEY_BASE") ||
+      "AzSYdvZj1lvYKuQD4ejEVHeo1FyMMflbzNw4Hhn7yDQ6AKithgnhJnNNJQgOFhQl",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:blog, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:blog, ~w(--watch)]}

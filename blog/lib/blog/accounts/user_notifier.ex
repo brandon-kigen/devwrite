@@ -129,10 +129,12 @@ defmodule Blog.Accounts.UserNotifier do
 
   # Delivers the email using the application mailer.
   defp deliver(recipient, subject, body) do
+    from_email = Application.get_env(:blog, :mail)[:from] || "contact@example.com"
+
     email =
       new()
       |> to(recipient)
-      |> from({"Blog", "contact@example.com"})
+      |> from({"Blog", from_email})
       |> subject(subject)
       |> text_body(body)
 

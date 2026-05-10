@@ -37,3 +37,6 @@ npm-debug.log
 */designs/
 */_build/
 /.continue # For GitHub Codespaces
+.env
+.env.*
+!.env.example
