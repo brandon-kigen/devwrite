@@ -3,10 +3,14 @@ name: Pipeline
 on:
   push:
     branches: ["main"]
-    paths: ["blog/**"]
+    paths: 
+      - "blog/**"
+      - ".github/workflows/**"
   pull_request:
     branches: ["main"]
-    paths: ["blog/**"]
+    paths: 
+      - "blog/**"
+      - ".github/workflows/**"
 
 permissions:
   contents: read
