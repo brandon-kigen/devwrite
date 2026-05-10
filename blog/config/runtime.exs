@@ -53,16 +53,11 @@ if config_env() == :prod do
     http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: port],
     secret_key_base: secret_key_base
 
-  # Mailer configuration for production
-  # Using SMTP by default as it is widely supported
-  if System.get_env("SMTP_RELAY") do
+  # Mailer configuration for production using Resend API
+  if System.get_env("RESEND_API_KEY") do
     config :blog, Blog.Mailer,
-      adapter: Swoosh.Adapters.SMTP,
-      relay: System.get_env("SMTP_RELAY"),
-      username: System.get_env("SMTP_USERNAME"),
-      password: System.get_env("SMTP_PASSWORD"),
-      ssl: true,
-      port: 587
+      adapter: Swoosh.Adapters.Resend,
+      api_key: System.get_env("RESEND_API_KEY")
   end
 
   config :blog, :mail, from: System.get_env("MAILER_FROM") || "contact@example.com"

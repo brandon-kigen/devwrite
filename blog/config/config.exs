@@ -38,6 +38,9 @@ config :blog, BlogWeb.Endpoint,
 
 config :blog, Blog.Mailer, adapter: Swoosh.Adapters.Local
 
+# Configures the API client for Swoosh
+config :swoosh, :api_client, Swoosh.ApiClient.Hackney
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.25.4",
