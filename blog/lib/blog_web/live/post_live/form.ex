@@ -1,4 +1,131 @@
 defmodule BlogWeb.PostLive.Form do
+  @moduledoc """
+  Post creation and editing form.
+
+  Allows authenticated users to create new posts or edit existing ones.
+  Provides live validation and publishing options.
+
+  ## Create Post Flow
+
+  1. User navigates to `/posts/new`
+  2. Blank form rendered
+  3. User fills title, body, topics
+  4. Form validates on change
+  5. User clicks "Save" to publish or save as draft
+  6. Post created via Posts.create_post/2
+  7. Redirect to post view
+
+  ## Edit Post Flow
+
+  1. User navigates to `/posts/:id/edit`
+  2. System loads post and verifies ownership
+  3. If not owner: Error flash and redirect to `/posts`
+  4. Form pre-populated with current content
+  5. User modifies title/body/topics
+  6. Form validates on change
+  7. User clicks "Save"
+  8. Post updated via Posts.update_post/3
+  9. Redirect to post view
+
+  ## Authorization
+
+  Edit: Verified in handle_params/3
+  - Loads post from database
+  - Checks post.user_id == current_user.id
+  - Redirects with error if not owner
+  - Prevents unauthorized edits
+
+  ## Form Fields
+
+  - **Title** — Post headline (required)
+  - **Body** — Post content, markdown/HTML (required)
+  - **Topics** — Comma-separated tags (optional)
+    - Parsed: "elixir, phoenix" → ["elixir", "phoenix"]
+    - Currently parsed but not used for filtering
+  - **Publish** — Toggle draft/published state
+    - Unchecked: Draft (published_at: nil)
+    - Checked: Publish now (published_at: DateTime.utc_now())
+
+  ## Draft vs Published
+
+  Draft posts:
+  - `published_at` is nil
+  - Not visible in feed (`list_posts/0` filters by published_at)
+  - Can be edited without public visibility
+  - Owner can view via direct link
+
+  Published posts:
+  - `published_at` set to publication time
+  - Visible in feed for all users
+  - Can be edited (updates content)
+  - View count tracked
+
+  ## Live Validation
+
+  Form validates on keystroke via `phx-change`:
+  - Validates title presence
+  - Validates body presence
+  - Shows errors inline
+  - Disables save button if invalid
+  - No database writes (validation only)
+
+  ## Assignments
+
+  ### Create (live_action = :new)
+  - `post` — nil (no existing post)
+  - `changeset` — Empty Post changeset
+  - `form_title` — "" (empty)
+  - `form_body` — "" (empty)
+  - `form_topics` — "" (empty)
+  - `published_at` — nil
+  - `publish_now` — false
+
+  ### Edit (live_action = :edit)
+  - `post` — Loaded post object
+  - `changeset` — Post changeset with current data
+  - `form_title` — Current post title
+  - `form_body` — Current post body
+  - `form_topics` — Topics joined as string
+  - `published_at` — Current publication time (or nil)
+  - `publish_now` — false (use existing published_at)
+
+  ### Authentication
+  Requires login (`:require_authenticated` hook):
+  - Redirect to login if not authenticated
+  - current_scope.user guaranteed to be available
+  - User ID stored for ownership verification (edit)
+
+  ## Events
+
+  - `validate` — Validate form on change (no save)
+  - `save` — Submit and create/update post
+
+  ## Topic Parsing
+
+  Topics are parsed from comma-separated string:
+  - Input: "elixir, phoenix, liveview"
+  - Stored: ["elixir", "phoenix", "liveview"]
+  - Whitespace trimmed
+  - Currently stored but not indexed/searchable
+
+  ## Publish Behavior
+
+  When user checks "Publish now":
+  - published_at set to current time
+  - Post becomes visible in feed
+  - View count starts tracking
+  - Cannot be un-published (archived feature not implemented)
+
+  Draft posts remain private until explicitly published.
+
+  ## Error Handling
+
+  - Ownership check failed: Error flash + redirect
+  - Validation failed: Show errors inline, disable save
+  - Database error: Flash error message
+  - Redirect: To post view on success
+  """
+
   use BlogWeb, :live_view
 
   alias Blog.Posts
@@ -155,7 +282,7 @@ defmodule BlogWeb.PostLive.Form do
           </.link>
         </div>
         <div class="flex items-center gap-sm">
-          <.link href={~p"/posts"} class="font-ui-label text-ui-label text-on-surface-variant hover:text-primary transition-colors">
+          <.link href={~p"/feed"} class="font-ui-label text-ui-label text-on-surface-variant hover:text-primary transition-colors">
             Cancel
           </.link>
         </div>

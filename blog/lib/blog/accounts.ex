@@ -1,6 +1,69 @@
 defmodule Blog.Accounts do
   @moduledoc """
-  The Accounts context.
+  The Accounts context handles all user account operations and security.
+
+  This module is responsible for:
+  - User registration and authentication
+  - Session management (token creation, validation, expiry)
+  - Email verification (magic links, confirmation, email changes)
+  - Password management and updates
+  - Sudo mode validation for sensitive operations
+  - Email notifications delivery
+
+  ## Authentication Flows
+
+  ### Email + Password Login
+  User provides email and password. System validates credentials and creates a session token.
+  Use `get_user_by_email_and_password/2` to validate credentials.
+
+  ### Magic Link Login
+  User receives a magic link via email (15-minute validity). Upon clicking, the link logs them in
+  and confirms their email if needed. Use `login_user_by_magic_link/1`.
+
+  ### Registration
+  New user registers with email/password. Account starts unconfirmed. Use `register_user/1`.
+  Confirmation email sent separately via `deliver_login_instructions/2`.
+
+  ### Email Confirmation
+  User clicks confirmation link in email. Confirms account and logs them in.
+  Tokens have 15-minute validity for security (email access = account access).
+
+  ### Password Change
+  User in sudo mode (within 10 minutes of login) can change password.
+  All other sessions immediately disconnected. Use `update_user_password/2`.
+
+  ### Email Change
+  User in sudo mode requests email change. Verification link sent to NEW email address.
+  Only updated after verification via `update_user_email/2`.
+
+  ## Session Management
+
+  Session tokens:
+  - Stored raw in database (already signed by Phoenix)
+  - Valid for 14 days from creation
+  - Reissued automatically after 7 days of use
+  - Deleted on logout
+  - All other sessions deleted when password changes
+
+  Remember-me cookies:
+  - 14-day validity
+  - Signed and secure
+  - Optional on login
+
+  ## Sudo Mode
+
+  Sudo mode provides additional security for sensitive operations:
+  - User must have authenticated within 10 minutes
+  - Required for: password changes, email changes
+  - Enforced by `:require_sudo_mode` LiveView hook
+  - Check with `sudo_mode?/2`
+
+  ## Authorization
+
+  Authorization checks happen here, not in web layer:
+  - Post/comment updates/deletes verify ownership
+  - Password changes validate current password
+  - Email changes require sudo mode
   """
 
   import Ecto.Query, warn: false
@@ -191,6 +254,7 @@ defmodule Blog.Accounts do
     token
   end
 
+  @spec get_user_by_session_token(any()) :: any()
   @doc """
   Gets the user with the given signed token.
 

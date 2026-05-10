@@ -1,4 +1,140 @@
 defmodule Blog.Posts.Post do
+  @moduledoc """
+  Post database schema and changesets.
+
+  Represents a user-created blog post with publication control,
+  interactions (comments, likes), and engagement tracking (view count).
+
+  ## Database Fields
+
+  ### Content
+  - **title** (string) — Post headline
+    - Required, 5-200 characters
+    - Visible in feed and post view
+
+  - **body** (string) — Post content
+    - Required, minimum 20 characters
+    - Can contain markdown or plain text
+    - Rendered as-is (no HTML processing)
+
+  - **topics** (array of strings) — Post tags/categories
+    - Optional, default empty array
+    - Example: ["elixir", "phoenix", "liveview"]
+    - Stored in database but not indexed/searchable
+    - Could be extended for filtering feed by topic
+
+  ### Engagement
+  - **view_count** (integer) — Number of times post viewed
+    - Default 0
+    - Incremented in PostLive.Show on mount
+    - Could be extended for "most viewed" ranking
+
+  ### Publishing
+  - **published_at** (UTC datetime) — Publication timestamp
+    - Optional, default nil (draft)
+    - nil = post is draft (not in feed)
+    - Set = post is published (visible in feed)
+    - Cannot be un-published (no draft conversion)
+    - Could be extended for scheduled publishing
+
+  ### Relationships
+  - **user_id** (foreign key) — Post author
+    - Belongs to User
+    - Required (every post has an author)
+    - Used for authorization (edit/delete only by author)
+    - Used for displaying author in feed
+
+  - **comments** (has_many) — Comments on this post
+    - Comments reference post_id
+    - One post can have many comments
+    - Comments deleted when post deleted (cascade)
+
+  - **likes** (has_many) — Likes on this post
+    - Likes reference post_id
+    - One post can have many likes
+    - Likes deleted when post deleted (cascade)
+
+  ### Timestamps
+  - **inserted_at** (UTC datetime) — When post created
+  - **updated_at** (UTC datetime) — When post last modified
+
+  ## Draft vs Published
+
+  Draft post:
+  - `published_at` is nil
+  - Not returned by `Posts.list_posts/0` (filters published_at != nil)
+  - Not visible in feed
+  - Author can view via `/posts/:id/edit` or direct link
+  - Can be edited without public visibility
+
+  Published post:
+  - `published_at` is set to timestamp
+  - Visible in feed for all users
+  - Can still be edited (changes visible immediately)
+  - View count incremented
+  - Cannot be converted to draft (published state is permanent)
+
+  ## Changeset
+
+  `changeset/2` validates data before writing to database:
+  - Allows: title, body, topics, published_at (only these fields can change)
+  - Requires: title and body (both mandatory)
+  - Title: 5-200 characters (minimum headline length, maximum readability)
+  - Body: minimum 20 characters (prevents empty/trivial posts)
+
+  ## Topics Field
+
+  Currently stored but not utilized:
+  - Parsed from comma-separated string in form
+  - "elixir, phoenix" → ["elixir", "phoenix"]
+  - Stored in database as array
+  - Not indexed or searchable
+  - Could be extended for:
+    - Feed filtering (show posts by topic)
+    - Topic pages (all posts for tag)
+    - Related posts (find other posts with same topic)
+
+  Future enhancement opportunity.
+
+  ## View Count Tracking
+
+  Incremented automatically on post view:
+  - PostLive.Show `mount/3` calls `Posts.increment_view_count/1`
+  - Happens once per page load (not per unique user)
+  - Used for engagement metrics
+  - Could be extended for:
+    - "Most popular" post ranking
+    - Analytics dashboard
+    - Recommender system
+
+  ## Authorization
+
+  Edit/Delete authorization handled at context layer (Posts.update_post/3, etc.):
+  - Not enforced in schema
+  - Authorization checked before any operation
+  - Schema only defines structure and validation
+
+  ## Future Enhancements
+
+  Topic indexing:
+  - Add index on topics for search/filter performance
+  - Build topic pages (/topics/:name)
+
+  Publication scheduling:
+  - Allow scheduling posts for future publish date
+  - Add scheduled publishing job queue
+
+  Soft deletes:
+  - Add deleted_at timestamp instead of hard delete
+  - Preserve view count and engagement
+  - Allow post recovery
+
+  Analytics:
+  - Track unique view count per user
+  - Track comment engagement
+  - Track like engagement over time
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -2,6 +2,35 @@ defmodule Blog.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @moduledoc """
+  User account schema.
+
+  ## Fields
+
+  - `email` — Unique email address. Required, must be valid format.
+  - `password` — Virtual field for form submission. Not stored in database.
+  - `hashed_password` — Bcrypt hashed password. Redacted in logs.
+  - `confirmed_at` — Timestamp when email was confirmed. Nil = unconfirmed.
+  - `authenticated_at` — Virtual field. Updated on login, used for sudo mode validation.
+
+  ## Email Confirmation
+
+  New accounts start with `confirmed_at: nil`. They become confirmed when:
+  1. User clicks confirmation link from registration email, OR
+  2. User logs in via magic link, OR
+  3. User registers (confirmed immediately with default flow)
+
+  Unconfirmed accounts with a password cannot use magic link auth (security measure).
+
+  ## Sudo Mode
+
+  The `authenticated_at` timestamp determines sudo mode eligibility:
+  - Updated on successful login
+  - User is in sudo mode for ~10 minutes after login
+  - Required for sensitive operations: password/email changes
+  - Enforced by `Accounts.sudo_mode?/2`
+  """
+
   schema "users" do
     field(:email, :string)
     field(:password, :string, virtual: true, redact: true)

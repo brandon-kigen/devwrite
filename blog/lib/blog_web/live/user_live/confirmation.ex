@@ -1,4 +1,91 @@
 defmodule BlogWeb.UserLive.Confirmation do
+  @moduledoc """
+  Email confirmation and magic link authentication page.
+
+  This page handles two distinct flows:
+  1. Email confirmation for new users (after registration)
+  2. Magic link login for existing users
+
+  The page automatically detects which flow based on user state (confirmed_at).
+
+  ## Email Confirmation Flow
+
+  **For new users (confirmed_at is nil):**
+  1. User registers and receives confirmation email
+  2. Email contains link: /users/log-in/:token
+  3. User clicks link, lands on this page
+  4. Page shows "Confirm and stay logged in" or "Confirm and log in only this time"
+  5. User clicks button
+  6. Form submits to UserSessionController.create/2
+  7. Account confirmed: confirmed_at set to current time
+  8. User logged in: session token created
+  9. Redirects to /feed (or user_return_to)
+
+  Remember-me checkbox available for both options.
+
+  ## Magic Link Login Flow
+
+  **For existing users (confirmed_at is not nil):**
+  1. User requests login via magic link
+  2. User receives email with link: /users/log-in/:token
+  3. User clicks link, lands on this page
+  4. Page shows "Log in" button (account already confirmed)
+  5. User clicks button
+  6. Form submits to UserSessionController.create/2
+  7. User logged in: session token created
+  8. Redirects to /feed (or user_return_to)
+
+  No additional confirmation needed (account already confirmed).
+
+  ## Token Handling
+
+  Token in URL (route parameter):
+  - Extracted by mount/4
+  - Passed to form as hidden field
+  - Sent to UserSessionController on submit
+  - Controller validates token and logs in user
+  - Token is one-time use (deleted after use)
+  - Valid for 15 minutes (security: email access = account access)
+
+  ## Form Submission
+
+  Form uses `phx-trigger-action` to submit HTTP POST:
+  - Cannot directly validate token from LiveView
+  - Controller performs token validation
+  - Session creation happens in controller (cookies)
+  - Redirects with success message
+
+  ## State Management
+
+  ### Assignments (mount)
+  - `user` — User object loaded from token validation
+  - `form` — Form changeset with token and remember_me
+  - `trigger_submit` — Boolean for form submission trigger
+  - `page_title` — Browser tab title
+
+  ### Authentication
+  This is a public page (no auth required):
+  - Token in URL is the authentication mechanism
+  - Invalid/expired token shows error
+  - Accessible to anyone with valid token link
+
+  ## Error Cases
+
+  - Invalid token: Controller returns error flash
+  - Expired token (15+ minutes): Controller returns error flash
+  - Wrong email: Token linked to specific email (email change proof)
+  - User deleted: Controller returns error flash
+
+  All errors redirect to login page with message.
+
+  ## Remember Me
+
+  Optional checkbox available on both flows:
+  - Checked: Remember-me cookie set (14 days)
+  - Unchecked: Session only (valid until browser closed)
+  - Default: Unchecked
+  """
+
   use BlogWeb, :live_view
 
   alias Blog.Accounts

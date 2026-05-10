@@ -1,4 +1,112 @@
 defmodule BlogWeb.PostLive.Show do
+  @moduledoc """
+  Single post view with real-time comments and interactions.
+
+  This is the most complex LiveView in the application:
+  - Displays post content (title, body, author, date)
+  - Manages real-time comment section with lazy loading
+  - Handles like/unlike functionality
+  - Allows authenticated users to create/delete comments
+  - Allows post owner to delete post
+  - Subscribes to PubSub for real-time updates
+  - Increments view count on initial connection
+
+  ## Features
+
+  ### Post Display
+  - Shows post content with metadata (author, date, view count)
+  - Post owner can delete their own post (with confirmation)
+  - Like button available for authenticated users
+  - Like count updated in real-time
+
+  ### Comment Section
+  - Lazy loading: Comments load on demand via IntersectionObserver
+  - Real-time updates: New comments appear instantly for all viewers
+  - Create comment: Authenticated users can add comments
+  - Delete comment: Users can delete their own comments
+  - Comment author displayed with each comment
+
+  ### Real-Time Updates
+  - Subscribes to "post: {post_id}" topic on mount
+  - Receives {:new_comment, comment} messages from Posts.create_comment/3
+  - Automatically appends new comments without full page reload
+  - Multiple viewers see updates simultaneously
+
+  ### View Count
+  - Incremented atomically via Posts.increment_view_count/1
+  - Tracks unique visitors
+  - Only incremented on first connection (not on reconnects)
+
+  ## State Management
+
+  ### Initial Assignments (mount)
+  - `post` — Post data with user and comments preloaded
+  - `like_count` — Number of likes
+  - `liked_by_current` — Whether current user liked post
+  - `comments` — List of comments (empty until lazy loaded)
+  - `comments_loaded` — Boolean flag to track if loaded
+  - `new_comment_body` — Text buffer for comment form
+
+  ### Session Token Handling
+  The `:mount_current_scope` hook runs before mount, assigning:
+  - `socket.assigns.current_scope` — Scope struct with user or nil
+  - This makes authenticated user info available throughout
+
+  ## Request Handlers
+
+  ### handle_params/3
+  Runs after mount when parameters change:
+  - Checks `connected?(socket)` to distinguish between render and connection
+  - Increments view count (only on actual connection, not static render)
+  - Subscribes to PubSub topic for real-time updates
+  - Does NOT load comments (deferred to lazy load event)
+
+  ### handle_event/3
+  User interactions:
+  - `load_comments` — Lazy load comments when IntersectionObserver fires
+  - `load_and_focus_comments` — Load and focus comment input
+  - `like` — Like post (requires authentication)
+  - `create_comment` — Submit new comment
+  - `delete_comment` — Delete comment (ownership required)
+  - `delete_post` — Delete post (ownership required)
+  - `update_comment_body` — Update comment text buffer
+
+  ### handle_info/2
+  Real-time message handling:
+  - `{:new_comment, comment}` — Broadcast from other user creating comment
+  - Appends new comment to comments list
+  - UI re-renders automatically
+
+  ## Authorization
+
+  Enforced by Posts context, not here:
+  - Delete comment: Only comment author can delete
+  - Delete post: Only post owner can delete
+  - Like: Any authenticated user can like
+  - Create comment: Any authenticated user can comment
+
+  Unauthorized attempts return errors from context.
+  LiveView should handle {:error, :unauthorized} appropriately.
+
+  ## Lazy Loading Pattern
+
+  1. Comments start empty (`comments: []`)
+  2. User scrolls down, IntersectionObserver visible
+  3. JavaScript hook sends `load_comments` event
+  4. LiveView loads all comments and updates socket
+  5. Comments rendered in HTML
+  6. Future comments come via PubSub broadcasts
+  7. Avoids loading large comment trees unnecessarily
+
+  ## Performance Considerations
+
+  - View count uses atomic increment (no race conditions)
+  - Comment subscription happens once per connection
+  - Likes use on_conflict strategy (idempotent)
+  - Comments preloaded with user on get_post!/1
+  - Like count is aggregated query (not pre-calculated)
+  """
+
   use BlogWeb, :live_view
 
   alias Blog.Posts

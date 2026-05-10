@@ -17,8 +17,10 @@ defmodule BlogWeb do
   those modules here.
   """
 
+  @spec static_paths() :: [<<_::40, _::_*8>>, ...]
   def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
 
+  @spec router() :: {:__block__, [], [{:import, [...], [...]} | {:use, [...], [...]}, ...]}
   def router do
     quote do
       use Phoenix.Router, helpers: false

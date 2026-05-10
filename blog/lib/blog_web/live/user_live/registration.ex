@@ -1,4 +1,80 @@
 defmodule BlogWeb.UserLive.Registration do
+  @moduledoc """
+  User registration form with live validation.
+
+  Allows new users to create an account.
+  Uses live validation to provide real-time feedback.
+  On successful submission, account is created and confirmation email sent.
+
+  ## Account Creation Flow
+
+  1. User fills email and password fields
+  2. Form validates on change events
+  3. User submits form
+  4. Account created via Accounts.register_user/1
+  5. User is **not** logged in automatically
+  6. Confirmation email sent to provided email address
+  7. User redirected to login page with message
+  8. User clicks confirmation link in email
+  9. Account confirmed and user logged in
+
+  ## Live Validation
+
+  Validation happens as user types:
+  - `phx-change="validate"` event on form changes
+  - Updates form changeset
+  - Displays validation errors in real-time
+  - No server submission until explicitly submitted
+
+  Validation checks:
+  - Email format and uniqueness
+  - Password requirements (min 12 characters)
+  - Password confirmation matches
+  - No database writes during validation (validate_unique: false)
+
+  ## State Management
+
+  ### Assignments (mount)
+  - `form` — Ecto changeset for registration form
+  - `trigger_submit` — Boolean for form submission
+  - `page_title` — Browser tab title
+
+  ### Authentication
+  Uses `:mount_current_scope` hook (optional user):
+  - Public page: works for any user
+  - If already logged in: Could redirect to /feed
+  - Currently allows re-registration (admin consideration)
+
+  ## Events
+
+  - `validate` — Validate form without submission (live feedback)
+  - `save` — Submit and create account
+
+  ## Error Handling
+
+  Validation errors displayed inline:
+  - Email: Format, uniqueness, required
+  - Password: Length, complexity, confirmation match
+  - Server errors: Displayed in flash message
+
+  ## Password Security
+
+  - Minimum 12 characters (configurable)
+  - Hashed with Bcrypt via Comeonin
+  - Never logged or stored in plain text
+  - Confirmation required to prevent typos
+  - Virtual field: not persisted to DB, only changeset
+
+  ## Email Confirmation
+
+  After registration:
+  - User receives email with confirmation link
+  - Link includes one-time token (15-minute validity)
+  - Token hashed in database (security)
+  - Clicking link confirms account and logs in
+  - Unconfirmed accounts can use magic link to confirm + login
+  """
+
   use BlogWeb, :live_view
 
   alias Blog.Accounts

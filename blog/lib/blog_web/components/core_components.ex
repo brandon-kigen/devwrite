@@ -1,30 +1,463 @@
 defmodule BlogWeb.CoreComponents do
   @moduledoc """
-  Provides core UI components.
+  Reusable UI components for the Blog application.
 
-  At first glance, this module may seem daunting, but its goal is to provide
-  core building blocks for your application, such as tables, forms, and
-  inputs. The components consist mostly of markup and are well-documented
-  with doc strings and declarative assigns. You may customize and style
-  them in any way you want, based on your application growth and needs.
+  This module provides a library of pre-built, styled components that are used
+  throughout the application. Components are built using:
 
-  The foundation for styling is Tailwind CSS, a utility-first CSS framework,
-  augmented with daisyUI, a Tailwind CSS plugin that provides UI components
-  and themes. Here are useful references:
+  - **Phoenix.Component** — Component system (renders to HEEX templates)
+  - **Tailwind CSS** — Utility-first CSS framework for styling
+  - **daisyUI** — Tailwind plugin with pre-built components (buttons, forms, modals, cards)
+  - **Heroicons** — Icon library (outline, solid, mini styles)
 
-    * [daisyUI](https://daisyui.com/docs/intro/) - a good place to get
-      started and see the available components.
+  Components can be used from HEEX templates via dot notation:
+  ```heex
+  <.button>Click me</.button>
+  <.input field={@form[:email]} type="email" />
+  ```
 
-    * [Tailwind CSS](https://tailwindcss.com) - the foundational framework
-      we build on. You will use it for layout, sizing, flexbox, grid, and
-      spacing.
+  ## Component Types
 
-    * [Heroicons](https://heroicons.com) - see `icon/1` for usage.
+  ### Layout Components
+  - `header/1` — Page header with title, subtitle, actions
 
-    * [Phoenix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html) -
-      the component system used by Phoenix. Some components, such as `<.link>`
-      and `<.form>`, are defined there.
+  ### Form Components
+  - `input/1` — Universal text/email/password/select/textarea/checkbox inputs
+  - `button/1` — Styled button with navigation support
 
+  ### Feedback Components
+  - `flash/1` — Toast notifications (info/error) that auto-dismiss
+
+  ### Data Display Components
+  - `table/1` — Sortable/clickable table with rows and columns
+  - `list/1` — Key-value list display
+
+  ### Utility Components
+  - `icon/1` — Heroicon rendering by name
+
+  ## Using Components
+
+  ### Input Component
+
+  Text inputs:
+  ```heex
+  <.input field={@form[:email]} type="email" label="Email" />
+  <.input name="search" placeholder="Search..." />
+  ```
+
+  Select dropdown:
+  ```heex
+  <.input
+    type="select"
+    options={["Admin": "admin", "User": "user"]}
+    value={@selected}
+  />
+  ```
+
+  Checkboxes:
+  ```heex
+  <.input type="checkbox" field={@form[:subscribe]} label="Subscribe" />
+  ```
+
+  Textareas:
+  ```heex
+  <.input type="textarea" field={@form[:body]} label="Post Content" />
+  ```
+
+  Form usage (integrated with Phoenix forms):
+  ```heex
+  <.form :let={f} for={@changeset} phx-change="validate">
+    <.input field={f[:email]} type="email" />
+  </.form>
+  ```
+
+  ### Button Component
+
+  Basic button:
+  ```heex
+  <.button>Save</.button>
+  ```
+
+  Navigation:
+  ```heex
+  <.button navigate={~p"/posts"}>View Posts</.button>
+  <.button href="https://example.com">External Link</.button>
+  ```
+
+  Click handling:
+  ```heex
+  <.button phx-click="delete">Delete</.button>
+  ```
+
+  With custom classes:
+  ```heex
+  <.button class="btn-sm btn-outline">Small Button</.button>
+  ```
+
+  ### Flash Notifications
+
+  In layout:
+  ```heex
+  <.flash :if={@flash} kind={:info} flash={@flash} title="Success!" />
+  <.flash kind={:error} flash={@flash} />
+  ```
+
+  Flash messages set in controllers:
+  ```elixir
+  put_flash(conn, :info, "Post created!")
+  ```
+
+  In LiveView:
+  ```elixir
+  {:ok, socket |> put_flash(:info, "Saved!")}
+  ```
+
+  ### Icon Component
+
+  Outline icons (default):
+  ```heex
+  <.icon name="hero-home" />
+  <.icon name="hero-envelope" class="size-5" />
+  ```
+
+  Solid icons:
+  ```heex
+  <.icon name="hero-home-solid" />
+  ```
+
+  Mini icons:
+  ```heex
+  <.icon name="hero-home-mini" />
+  ```
+
+  Colored and sized:
+  ```heex
+  <.icon name="hero-check-circle" class="size-6 text-success" />
+  <.icon name="hero-x-mark" class="size-4 text-error" />
+  ```
+
+  Animated:
+  ```heex
+  <.icon name="hero-arrow-path" class="animate-spin" />
+  ```
+
+  See https://heroicons.com for all available icons.
+
+  ### Table Component
+
+  Basic table:
+  ```heex
+  <.table id="posts" rows={@posts}>
+    <:col :let={post} label="Title">{post.title}</:col>
+    <:col :let={post} label="Author">{post.user.email}</:col>
+  </.table>
+  ```
+
+  With clickable rows:
+  ```heex
+  <.table
+    id="posts"
+    rows={@posts}
+    row_click={fn post -> JS.navigate(~p"/posts/{post}") end}
+  >
+    <:col :let={post} label="Title">{post.title}</:col>
+  </.table>
+  ```
+
+  With actions:
+  ```heex
+  <.table id="posts" rows={@posts}>
+    <:col :let={post} label="Title">{post.title}</:col>
+    <:action :let={post}>
+      <.link patch={~p"/posts/{post}/edit"}>Edit</.link>
+    </:action>
+    <:action :let={post}>
+      <.link phx-click="delete" data-confirm="Sure?">Delete</.link>
+    </:action>
+  </.table>
+  ```
+
+  With LiveStreams (efficient updates):
+  ```heex
+  <.table id="posts" rows={@streams.posts}>
+    <:col :let={post} label="Title">{post.title}</:col>
+  </.table>
+  ```
+
+  ### List Component
+
+  Key-value list:
+  ```heex
+  <.list>
+    <:item title="Email">{@user.email}</:item>
+    <:item title="Joined">{@user.inserted_at}</:item>
+  </.list>
+  ```
+
+  ### Header Component
+
+  Simple header:
+  ```heex
+  <.header>My Page</.header>
+  ```
+
+  With subtitle:
+  ```heex
+  <.header>
+    Posts
+    <:subtitle>All published posts</:subtitle>
+  </.header>
+  ```
+
+  With actions:
+  ```heex
+  <.header>
+    Posts
+    <:actions>
+      <.button navigate={~p"/posts/new"}>New Post</.button>
+    </:actions>
+  </.header>
+  ```
+
+  ## Styling System
+
+  ### Tailwind CSS
+
+  Utilities for layout, sizing, spacing:
+  ```heex
+  <div class="flex gap-4 p-4 max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold">Title</h1>
+  </div>
+  ```
+
+  Common utilities:
+  - Layout: `flex`, `grid`, `block`, `inline-block`
+  - Spacing: `p-4` (padding), `m-4` (margin), `gap-4` (gap)
+  - Sizing: `w-full`, `h-10`, `max-w-2xl`
+  - Typography: `text-lg`, `font-bold`, `text-gray-600`
+  - Colors: `bg-blue-500`, `text-error`, `border-base-300`
+  - Responsive: `sm:`, `md:`, `lg:`, `xl:` prefixes
+
+  See https://tailwindcss.com for complete reference.
+
+  ### daisyUI
+
+  Pre-styled components on top of Tailwind:
+
+  Buttons:
+  ```heex
+  <button class="btn">Default</button>
+  <button class="btn btn-primary">Primary</button>
+  <button class="btn btn-sm btn-outline">Small Outline</button>
+  ```
+
+  Inputs/Selects:
+  ```heex
+  <input class="input input-bordered" />
+  <input class="input input-error" />
+  <select class="select select-bordered">...</select>
+  ```
+
+  Cards:
+  ```heex
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title">Title</h2>
+      Content here
+    </div>
+  </div>
+  ```
+
+  Modals:
+  ```heex
+  <input type="checkbox" id="modal" class="modal-toggle" />
+  <div class="modal">
+    <div class="modal-box">
+      <h3>Title</h3>
+      Content
+    </div>
+  </div>
+  ```
+
+  Alerts/Toast:
+  ```heex
+  <div class="alert alert-info">
+    <svg>...</svg>
+    <span>Info message</span>
+  </div>
+
+  <div class="toast toast-top toast-end">
+    <div class="alert alert-success">Success!</div>
+  </div>
+  ```
+
+  Badges:
+  ```heex
+  <span class="badge">Default</span>
+  <span class="badge badge-primary">Primary</span>
+  <span class="badge badge-error">Error</span>
+  ```
+
+  See https://daisyui.com/docs/intro/ for all components.
+
+  ## Color System
+
+  daisyUI themes use semantic color names:
+  - `primary` — Main brand color (blue)
+  - `secondary` — Secondary color
+  - `accent` — Accent color
+  - `neutral` — Neutral shade
+  - `base-100/200/300` — Background variants
+  - `info` — Information (blue)
+  - `success` — Success (green)
+  - `warning` — Warning (orange)
+  - `error` — Error (red)
+
+  Used in classes:
+  ```heex
+  <div class="bg-primary text-primary-content">Primary background</div>
+  <div class="bg-error text-error-content">Error background</div>
+  ```
+
+  Current theme: Material Design 3 (configured in assets/vendor/daisyui-theme.js)
+
+  ## Responsive Design
+
+  Mobile-first approach:
+  ```heex
+  <div class="flex flex-col sm:flex-row gap-4">
+    <!-- Single column on mobile, two columns on sm+ -->
+    <div class="w-full sm:w-1/2">Column 1</div>
+    <div class="w-full sm:w-1/2">Column 2</div>
+  </div>
+  ```
+
+  Breakpoints (from Tailwind):
+  - sm: 640px
+  - md: 768px
+  - lg: 1024px
+  - xl: 1280px
+  - 2xl: 1536px
+
+  ## Accessibility
+
+  Components built with accessibility in mind:
+  - Semantic HTML (button, input, label, etc.)
+  - ARIA attributes for screen readers
+  - Keyboard navigation support
+  - Color contrast compliance
+  - Focus indicators visible
+
+  Example:
+  ```heex
+  <label for="email">Email</label>
+  <input id="email" type="email" aria-describedby="email-error" />
+  <p id="email-error" class="text-error">{@error}</p>
+  ```
+
+  ## JavaScript Interaction
+
+  Some components use Phoenix.LiveView.JS for client-side interactivity:
+
+  - `show/2` — Reveal element with animation
+  - `hide/2` — Hide element with animation
+  - Flash dismissal via phx-click
+
+  See Phoenix.LiveView.JS docs for more commands.
+
+  ## Extending Components
+
+  All components accept `@rest` for arbitrary HTML attributes:
+  ```heex
+  <.button class="btn-lg" data-test="submit">
+  ```
+
+  Override default styling:
+  ```heex
+  <.input class="input-lg" />
+  ```
+
+  Components are intentionally simple to encourage customization.
+  Modify styling in this file as needed for your design system.
+
+  ## Error Handling
+
+  Form validation errors integrated:
+  ```heex
+  <.input field={@form[:email]} errors={["Invalid email"]} />
+  ```
+
+  Errors displayed below input with icon:
+  ```
+  ⚠️ Invalid email
+  ```
+
+  Changeset integration (automatic):
+  ```heex
+  <.input field={@form[:email]} />
+  <!-- Errors from @form.errors[:email] automatically shown -->
+  ```
+
+  ## Translation
+
+  All text in components translatable via Gettext:
+  - Placeholder text uses `gettext/1`
+  - Error messages via `translate_error/1`
+  - Button text can be external
+
+  See lib/blog_web/gettext.ex for i18n setup.
+
+  Currently: No translations configured (English only)
+  Future: Add translations as needed
+
+  ## Performance
+
+  Components are lightweight:
+  - No JavaScript dependencies (except Heroicons CSS)
+  - Render at compile time (HEEX templates)
+  - Minimal CSS classes (Tailwind + daisyUI)
+  - LiveStream support for efficient table updates
+
+  ## Browser Support
+
+  All components work in:
+  - Chrome/Edge 90+
+  - Firefox 88+
+  - Safari 14+
+  - Mobile browsers (iOS Safari, Chrome Mobile)
+
+  Graceful degradation for older browsers.
+
+  ## Common Patterns
+
+  ### Form with validation
+  ```heex
+  <.form :let={f} for={@changeset} phx-change="validate">
+    <.input field={f[:email]} type="email" label="Email" />
+    <.input field={f[:password]} type="password" label="Password" />
+    <.button type="submit">Sign Up</.button>
+  </.form>
+  ```
+
+  ### Loading state
+  ```heex
+  <.button phx-disable-with="Saving...">
+    Save
+  </.button>
+  ```
+
+  ### Conditional rendering
+  ```heex
+  <.flash :if={@flash} kind={:info} flash={@flash} />
+  <.icon :if={@loading} name="hero-arrow-path" class="animate-spin" />
+  ```
+
+  ### Empty states
+  ```heex
+  <div :if={Enum.empty?(@posts)} class="text-center text-gray-500">
+    No posts yet.
+  </div>
+  ```
   """
   use Phoenix.Component
   use Gettext, backend: BlogWeb.Gettext

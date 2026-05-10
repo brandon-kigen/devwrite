@@ -3,6 +3,63 @@ defmodule Blog.Accounts.UserToken do
   import Ecto.Query
   alias Blog.Accounts.UserToken
 
+  @moduledoc """
+  User session and verification tokens.
+
+  ## Token Types (contexts)
+
+  Different token types are used for different purposes:
+
+  - `"session"` — Session tokens (14-day validity)
+    - Stored raw in database (already signed by Phoenix)
+    - Used to maintain user sessions
+    - Checked on every HTTP request and LiveView connection
+    - Automatically reissued after 7 days of use
+
+  - `"login"` — Magic link tokens (15-minute validity)
+    - Sent to user's email for authentication
+    - Hashed in database for security
+    - Confirms unconfirmed accounts
+    - One-time use
+
+  - `"change: {email}"` — Email change verification (7-day validity)
+    - Sent to NEW email address for verification
+    - Hashed in database
+    - One-time use
+
+  - `"reset_password"` — Password reset tokens (7-day validity)
+    - For password reset flows
+    - Hashed in database
+
+  ## Security Notes
+
+  - Magic link tokens (15 minutes) are short-lived because email access = account access
+  - Session tokens (14 days) are valid for two weeks before requiring re-login
+  - Token reissue happens automatically: users with 7+ day old tokens get new ones
+  - Hashed tokens in database prevent read-only DB access from compromising tokens
+  - Unconfirmed users with passwords cannot use magic links (prevents mixing auth methods)
+
+  ## Token Storage
+
+  Session tokens are stored raw (not hashed) because:
+  - They're already signed by Phoenix's session mechanism
+  - Faster verification (no hashing needed)
+  - Can be expired individually by deleting from DB
+  - Phoenix signs/verifies the token signature
+
+  Email tokens are hashed because:
+  - They travel in URLs/emails (less protected)
+  - Hash stored in DB prevents read-only DB access from compromising them
+  - One-way function means token can't be reconstructed from database
+
+  ## Authenticated At Field
+
+  The `authenticated_at` timestamp:
+  - Set to user's login time when session token created
+  - Allows sudo mode validation: checks if user authenticated within ~10 minutes
+  - Used to enforce re-authentication for sensitive operations
+  """
+
   @hash_algorithm :sha256
   @rand_size 32
 

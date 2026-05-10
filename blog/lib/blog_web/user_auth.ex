@@ -1,4 +1,72 @@
 defmodule BlogWeb.UserAuth do
+  @moduledoc """
+  Authentication middleware and LiveView hooks.
+
+  This module provides:
+
+  1. **Plug Middleware** for HTTP requests
+     - `fetch_current_scope_for_user/2` — Runs on every HTTP request
+     - Loads user from session token and assigns `current_scope`
+     - Handles remember-me cookie restoration
+     - Automatically reissues old tokens (7+ days)
+
+  2. **LiveView Hooks** for WebSocket connections
+     - `:mount_current_scope` — Loads user for public pages
+     - `:require_authenticated` — Requires login, redirects to `/users/log-in` if not
+     - `:require_sudo_mode` — Requires login + sudo mode (10 min window)
+
+  3. **Session Management**
+     - Login: Creates session token, sets signed cookie, optional remember-me
+     - Logout: Deletes token, clears cookies, disconnects LiveSocket
+     - Token Reissue: Automatic after 7 days of use
+     - Disconnect: Broadcasts to all connected LiveViews when logging out
+
+  4. **Security Features**
+     - Sudo Mode: Re-authentication required for sensitive ops (10 min window)
+     - Remember Me: 14-day cookie validity (separate from session token)
+     - Session Signing: All cookies are signed, not encrypted
+     - Token Storage: Session tokens stored in database for granular control
+
+  ## Request Flow
+
+  ### HTTP Request
+  1. Request comes in
+  2. `:browser` pipeline executes
+  3. `fetch_current_scope_for_user/2` runs
+  4. Extracts user token from session or remember-me cookie
+  5. Looks up user in database via token
+  6. Assigns `conn.assigns.current_scope` = Scope{user: user} or Scope{user: nil}
+  7. If token old (7+ days): Creates new token, updates cookies
+  8. Controller/LiveView receives request with current_scope assigned
+
+  ### LiveView Connection
+  1. WebSocket connects
+  2. Session data passed from HTTP
+  3. LiveView on_mount hook runs
+  4. Hook loads user via `fetch_current_scope_for_user` logic
+  5. Assigns `socket.assigns.current_scope`
+  6. Hook can halt socket if authentication required but user not logged in
+
+  ## Remember Me Cookies
+
+  Remember-me cookies:
+  - Valid for 14 days (matches session token validity)
+  - Signed (not encrypted) - contents are visible but can't be tampered with
+  - Restored on fresh browser session or expired session token
+  - Only set if user checks "Remember me" on login
+  - Deleted on logout
+
+  ## Token Reissue
+
+  Session tokens are automatically reissued:
+  - Every HTTP request checks token age
+  - If token created 7+ days ago: New token created
+  - New token stored in session and cookies
+  - Remember-me cookie also updated with new token
+  - Prevents old tokens from being valid indefinitely
+  - Users don't need to re-login
+  """
+
   use BlogWeb, :verified_routes
 
   import Plug.Conn

@@ -1,6 +1,51 @@
 defmodule Blog.Posts do
   @moduledoc """
-  The Posts context.
+  The Posts context handles all post, comment, and like operations.
+
+  ## Features
+
+  ### Posts
+  - Create, read, update, delete posts
+  - Publish/draft states
+  - View count tracking (atomic increments)
+  - Authorization: only post owner can edit/delete
+
+  ### Comments
+  - Create, read, delete comments on posts
+  - Real-time updates via PubSub
+  - Authorization: only comment author can delete
+  - Cascade delete: removing post deletes all comments
+
+  ### Likes
+  - Like/unlike posts
+  - Like counts and queries
+  - Uniqueness constraint: one like per user per post
+  - Idempotent: calling like_post twice = like_post once
+
+  ## Real-Time Updates
+
+  When a comment is created via `create_comment/3`:
+  1. Comment inserted into database
+  2. Broadcast sent to PubSub topic "post:{post_id}"
+  3. Message format: {:new_comment, comment}
+  4. All LiveViews subscribed to that post receive the message
+  5. UI updates in real-time without page refresh
+
+  ## Authorization Pattern
+
+  All operations that modify data include authorization checks:
+  - `update_post/3` verifies user owns the post
+  - `delete_post/2` verifies user owns the post
+  - `delete_comment/2` verifies user owns the comment
+  - Returns `{:error, :unauthorized}` if ownership check fails
+  - Web layer should handle authorization errors appropriately
+
+  ## Idempotent Operations
+
+  `like_post/2` is idempotent - calling it multiple times has same effect as once:
+  - Uses `on_conflict: :nothing` to silently ignore duplicate inserts
+  - Database constraint prevents duplicate (user_id, post_id) pairs
+  - Caller doesn't need to check if already liked
   """
 
   import Ecto.Query, warn: false

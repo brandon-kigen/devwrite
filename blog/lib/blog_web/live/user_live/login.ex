@@ -1,4 +1,57 @@
 defmodule BlogWeb.UserLive.Login do
+  @moduledoc """
+  Login page with email/password form.
+
+  This LiveView displays a login form for existing users.
+  Form submits to UserSessionController (not a LiveView action)
+  because LiveView cannot directly set session cookies.
+
+  ## Authentication Methods
+
+  Supports two login methods:
+  1. Email + password login
+  2. Magic link login (via token in URL parameters)
+
+  ## Form Submission
+
+  The form uses `phx-trigger-action` to submit to HTTP controller:
+  - Form collects email and password
+  - LiveView validates client-side
+  - On submit: HTML form triggers HTTP POST to /users/log-in
+  - UserSessionController handles session creation
+  - Response sets session cookie and redirects
+
+  This pattern is necessary because:
+  - LiveView sockets cannot modify cookies
+  - Session cookie is HTTP-only for security
+  - Controller provides request/response cycle for cookie headers
+
+  ## Email Pre-fill
+
+  If previous login attempt failed:
+  - Email field pre-populated from flash
+  - UX improvement: user doesn't retype email
+  - Password field always cleared (security)
+
+  ## State Management
+
+  ### Assignments (mount)
+  - `form` — Ecto form for email/password
+  - `trigger_submit` — Boolean for form submission trigger
+  - `page_title` — Browser tab title
+
+  ### Authentication
+  Uses `:mount_current_scope` hook (optional user):
+  - Works for anonymous and authenticated users
+  - If already logged in: User could be redirected to /feed
+  - Currently no special handling (allow re-login if desired)
+
+  ## Events
+
+  - No LiveView events (form is static HTML)
+  - All interaction handled by HTTP form submission
+  """
+
   use BlogWeb, :live_view
 
   alias Blog.Accounts

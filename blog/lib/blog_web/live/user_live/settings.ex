@@ -1,4 +1,110 @@
 defmodule BlogWeb.UserLive.Settings do
+  @moduledoc """
+  Account settings page for email and password management.
+
+  Provides two sections:
+  1. Email change with verification
+  2. Password change with current password validation
+
+  ## Security Requirements
+
+  Requires **sudo mode**: User must have authenticated within 10 minutes.
+  - Prevents unauthorized access if device left unattended
+  - Forces re-login for security-sensitive operations
+  - Checked by `:require_sudo_mode` hook on mount
+  - 10-minute window from authenticated_at timestamp
+
+  Both email change and password change require sudo mode.
+
+  ## Email Change Flow
+
+  1. User enters new email address
+  2. Form validates on change
+  3. User submits
+  4. System validates email not already in use
+  5. Creates verification token (7-day validity)
+  6. Sends email with verification link to **NEW** email
+  7. Success message: "Check your email"
+  8. User clicks link in email
+  9. Email updated in database
+  10. User redirected to login (to re-verify session)
+
+  Verification sent to new email prevents email hijacking.
+
+  ## Password Change Flow
+
+  1. User enters current password (validation)
+  2. User enters new password (min 12 characters)
+  3. User enters password confirmation
+  4. Form validates on change
+  5. User submits
+  6. System validates current password
+  7. System hashes new password with Bcrypt
+  8. **All other sessions immediately disconnected**
+  9. Current session renewed
+  10. User stays logged in with new credentials
+
+  Password change invalidates all other devices/sessions for security.
+  Current browser session renewed automatically.
+
+  ## Password Change - HTTP Submission
+
+  Password change submits via HTTP POST (not LiveView event):
+  - Form action: `/users/update-password` (controller route)
+  - `phx-trigger-action` controls submission
+  - UserSessionController handles password update
+  - Session rotation happens in controller
+  - Redirect with success message
+
+  Necessary because:
+  - Password change requires sudo mode verification
+  - Session token must be rotated (new password = new session)
+  - LiveView cannot directly manipulate session cookies
+
+  ## Assignments
+
+  ### Initial State (mount)
+  - `user` — Current user object
+  - `email_form` — Changeset for email change
+  - `password_form` — Changeset for password change
+  - `current_email` — User's current email (for password form hidden field)
+  - `trigger_submit` — Boolean for password form submission
+  - `page_title` — Browser tab title
+
+  ### Authentication
+  Uses `:require_sudo_mode` hook:
+  - Requires login ✓
+  - Requires sudo mode (10 min window) ✓
+  - Redirects to login if not in sudo window
+  - Allows access if conditions met
+
+  ## Events
+
+  - `validate_email` — Validate email form on change
+  - `update_email` — Submit email change (LiveView)
+  - `validate_password` — Validate password form on change
+  - `update_password` — Submit password change (HTTP POST)
+
+  ## Confirmation Flow
+
+  ### Email Confirmation
+
+  Route: `/users/settings/confirm-email/:token`
+  - Receives token from email verification link
+  - LiveView mounts with token parameter
+  - Automatically processes confirmation
+  - Shows success message
+  - Redirect to login for session refresh
+
+  ### Password Re-authentication
+
+  After password change:
+  - All other sessions invalidated
+  - Current session renewed
+  - User may need to re-login on other devices
+  - Email notification could be sent (not implemented)
+  """
+
   use BlogWeb, :live_view
 
   on_mount {BlogWeb.UserAuth, :require_sudo_mode}
