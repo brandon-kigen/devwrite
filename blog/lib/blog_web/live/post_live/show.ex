@@ -117,7 +117,7 @@ defmodule BlogWeb.PostLive.Show do
     like_count = Posts.like_count(post.id)
 
     liked_by_current =
-      if socket.assigns.current_scope.user do
+      if socket.assigns.current_scope && socket.assigns.current_scope.user do
         Posts.liked_by?(socket.assigns.current_scope.user, post.id)
       else
         false
@@ -184,7 +184,7 @@ defmodule BlogWeb.PostLive.Show do
 
   @impl true
   def handle_event("like", _value, socket) do
-    if socket.assigns.current_scope.user do
+    if socket.assigns.current_scope && socket.assigns.current_scope.user do
       user = socket.assigns.current_scope.user
 
       if socket.assigns.liked_by_current do
@@ -213,7 +213,7 @@ defmodule BlogWeb.PostLive.Show do
 
   @impl true
   def handle_event("create_comment", %{"comment" => %{"body" => body}}, socket) do
-    if socket.assigns.current_scope.user do
+    if socket.assigns.current_scope && socket.assigns.current_scope.user do
       user = socket.assigns.current_scope.user
 
       case Posts.create_comment(user, socket.assigns.post.id, %{"body" => body}) do
@@ -237,7 +237,7 @@ defmodule BlogWeb.PostLive.Show do
 
   @impl true
   def handle_event("delete_comment", %{"id" => comment_id}, socket) do
-    if socket.assigns.current_scope.user do
+    if socket.assigns.current_scope && socket.assigns.current_scope.user do
       comment = Enum.find(socket.assigns.comments, &(to_string(&1.id) == comment_id))
 
       case Posts.delete_comment(socket.assigns.current_scope.user, comment) do
@@ -294,8 +294,6 @@ defmodule BlogWeb.PostLive.Show do
     end
   end
 
-
-
   @impl true
   def render(assigns) do
     ~H"""
@@ -321,7 +319,7 @@ defmodule BlogWeb.PostLive.Show do
           </.link>
         </nav>
         <div class="flex items-center gap-sm">
-          <%= if @current_scope.user do %>
+          <%= if @current_scope && @current_scope.user do %>
             <.link
               href={~p"/posts/new"}
               class="font-ui-label text-ui-label font-bold bg-primary text-on-primary px-sm py-xs rounded-lg hover:shadow-md active:scale-95 transform transition-all duration-150"
@@ -329,7 +327,7 @@ defmodule BlogWeb.PostLive.Show do
               New Post
             </.link>
           <% end %>
-          <%= if @current_scope.user do %>
+          <%= if @current_scope && @current_scope.user do %>
             <%!-- Profile avatar + dropdown --%>
             <div class="relative">
               <button
@@ -476,7 +474,7 @@ defmodule BlogWeb.PostLive.Show do
           </div>
 
           <%!-- Edit/Delete buttons for owner --%>
-          <%= if @current_scope.user && @current_scope.user.id == @post.user_id do %>
+          <%= if @current_scope && @current_scope.user && @current_scope.user.id == @post.user_id do %>
             <div class="flex items-center gap-sm mb-lg">
               <.link href={~p"/posts/#{@post.id}/edit"} class="btn btn-ghost btn-sm">
                 <span class="material-symbols-outlined">edit</span> Edit
@@ -503,7 +501,7 @@ defmodule BlogWeb.PostLive.Show do
           </h2>
 
           <%!-- Comment Form --%>
-          <%= if @current_scope.user do %>
+          <%= if @current_scope && @current_scope.user do %>
             <form phx-submit="create_comment" class="mb-lg">
               <div class="mb-md">
                 <textarea
@@ -551,7 +549,7 @@ defmodule BlogWeb.PostLive.Show do
                           {Calendar.strftime(comment.inserted_at, "%b %d, %Y · %H:%M")}
                         </p>
                       </div>
-                      <%= if @current_scope.user && @current_scope.user.id == comment.user_id do %>
+                      <%= if @current_scope && @current_scope.user && @current_scope.user.id == comment.user_id do %>
                         <button
                           phx-click="delete_comment"
                           phx-value-id={comment.id}

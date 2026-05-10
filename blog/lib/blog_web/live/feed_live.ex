@@ -62,9 +62,10 @@ defmodule BlogWeb.FeedLive do
 
     posts = Posts.list_posts()
     # Preload like counts for each post
-    posts_with_likes = Enum.map(posts, fn post ->
-      {post, Posts.like_count(post.id)}
-    end)
+    posts_with_likes =
+      Enum.map(posts, fn post ->
+        {post, Posts.like_count(post.id)}
+      end)
 
     {:ok,
      socket

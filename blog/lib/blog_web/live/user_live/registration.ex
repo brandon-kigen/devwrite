@@ -88,20 +88,36 @@ defmodule BlogWeb.UserLive.Registration do
     <%!-- ═══ Fixed Navigation Header ═════════════════════════════════════════════ --%>
     <header class="bg-surface/95 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm">
       <div class="flex justify-between items-center max-w-container-max mx-auto px-md h-16">
-
         <%!-- Brand --%>
         <div class="flex items-center gap-sm">
           <a
             class="font-h3 text-[24px] leading-[1.4] font-black text-primary tracking-tight"
             href={~p"/"}
-          >DevWrite</a>
+          >
+            DevWrite
+          </a>
         </div>
 
         <%!-- Desktop nav links --%>
         <nav class="hidden md:flex items-center gap-lg">
-          <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors" href="#">Explore</a>
-          <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors" href="#">Feed</a>
-          <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors" href="#">Communities</a>
+          <a
+            class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+          >
+            Explore
+          </a>
+          <a
+            class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+          >
+            Feed
+          </a>
+          <a
+            class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+          >
+            Communities
+          </a>
         </nav>
 
         <%!-- Actions --%>
@@ -109,11 +125,15 @@ defmodule BlogWeb.UserLive.Registration do
           <a
             href={~p"/"}
             class="hidden md:block font-ui-label text-ui-label font-bold text-primary hover:bg-primary-container/10 rounded-lg transition-all duration-200 px-4 py-2"
-          >Home</a>
+          >
+            Home
+          </a>
           <a
             href={~p"/users/log-in"}
             class="font-ui-label text-ui-label font-bold bg-primary text-on-primary rounded-lg px-4 py-2 active:scale-95 transform transition-transform duration-150"
-          >Log In</a>
+          >
+            Log In
+          </a>
         </div>
       </div>
     </header>
@@ -121,7 +141,6 @@ defmodule BlogWeb.UserLive.Registration do
     <%!-- ═══ Main Content ════════════════════════════════════════════════════════ --%>
     <main class="flex-grow flex items-center justify-center pt-24 pb-12 px-md">
       <div class="w-full max-w-[440px] bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest p-lg relative overflow-hidden">
-
         <%!-- Decorative purple top bar --%>
         <div class="absolute top-0 left-0 w-full h-2 bg-primary"></div>
 
@@ -145,7 +164,10 @@ defmodule BlogWeb.UserLive.Registration do
         >
           <%!-- Email --%>
           <div class="space-y-xs">
-            <label class="font-ui-label text-ui-label font-semibold text-on-surface block" for="user_email">
+            <label
+              class="font-ui-label text-ui-label font-semibold text-on-surface block"
+              for="user_email"
+            >
               Email Address
             </label>
             <div class="focus-ring rounded-lg border border-outline-variant bg-surface-container-lowest flex items-center px-sm py-xs">
@@ -161,7 +183,10 @@ defmodule BlogWeb.UserLive.Registration do
 
           <%!-- Password --%>
           <div class="space-y-xs">
-            <label class="font-ui-label text-ui-label font-semibold text-on-surface block" for="user_password">
+            <label
+              class="font-ui-label text-ui-label font-semibold text-on-surface block"
+              for="user_password"
+            >
               Password
             </label>
             <div class="focus-ring rounded-lg border border-outline-variant bg-surface-container-lowest flex items-center px-sm py-xs">
@@ -177,7 +202,10 @@ defmodule BlogWeb.UserLive.Registration do
 
           <%!-- Confirm Password --%>
           <div class="space-y-xs">
-            <label class="font-ui-label text-ui-label font-semibold text-on-surface block" for="user_password_confirmation">
+            <label
+              class="font-ui-label text-ui-label font-semibold text-on-surface block"
+              for="user_password_confirmation"
+            >
               Confirm Password
             </label>
             <div class="focus-ring rounded-lg border border-outline-variant bg-surface-container-lowest flex items-center px-sm py-xs">
@@ -219,10 +247,30 @@ defmodule BlogWeb.UserLive.Registration do
       <div class="max-w-container-max mx-auto px-md py-lg flex flex-col md:flex-row justify-between items-center gap-sm">
         <div class="font-ui-label text-ui-label font-bold text-primary">DevWrite</div>
         <nav class="flex gap-md">
-          <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors" href="#">Changelog</a>
-          <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors" href="#">API Docs</a>
-          <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
-          <a class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors" href="#">Code of Conduct</a>
+          <a
+            class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+          >
+            Changelog
+          </a>
+          <a
+            class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+          >
+            API Docs
+          </a>
+          <a
+            class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+          >
+            Privacy Policy
+          </a>
+          <a
+            class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+          >
+            Code of Conduct
+          </a>
         </nav>
         <div class="font-ui-body text-ui-body text-on-surface-variant opacity-80">
           &copy; 2026 DevWrite. Crafted for the modern engineer.

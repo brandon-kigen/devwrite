@@ -152,7 +152,7 @@ defmodule Blog.Posts do
   Creates a comment for a post by a user and broadcasts it via PubSub.
   """
   def create_comment(%User{} = user, post_id, attrs \\ %{}) do
-    attrs = 
+    attrs =
       attrs
       |> Map.put("post_id", post_id)
       |> Map.put("user_id", user.id)
@@ -163,11 +163,13 @@ defmodule Blog.Posts do
     |> case do
       {:ok, comment} ->
         comment = Repo.preload(comment, :user)
+
         Phoenix.PubSub.broadcast(
           Blog.PubSub,
           "post:#{post_id}",
           {:new_comment, comment}
         )
+
         {:ok, comment}
 
       error ->
