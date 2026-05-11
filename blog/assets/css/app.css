@@ -2,7 +2,7 @@
    https://tailwindcss.com/docs/configuration */
 
 @import "tailwindcss" source(none);
-@import "../node_modules/trix/dist/trix.css";
+@import "trix/dist/trix.css";
 @source "../css";
 @source "../js";
 @source "../../lib/blog_web";

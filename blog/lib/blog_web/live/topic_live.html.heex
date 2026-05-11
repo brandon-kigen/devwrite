@@ -33,7 +33,7 @@
 </header>
 
 <%!-- ═══ Main Content ══════════════════════════════════════════════════════════ --%>
-<main class="flex-grow max-w-container-max mx-auto px-md pt-[104px] pb-xl w-full">
+<main class="grow max-w-container-max mx-auto px-md pt-[104px] pb-xl w-full">
   <%!-- ─── Page heading ──────────────────────────────────────────────────────── --%>
   <section class="mb-lg">
     <div>
@@ -72,7 +72,7 @@
                 <%= for topic <- post.topics do %>
                   <.link
                     href={~p"/topics/#{topic.id}"}
-                    class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider hover:opacity-80 transition-opacity"
+                    class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-0.5 rounded uppercase text-[10px] tracking-wider hover:opacity-80 transition-opacity"
                   >
                     {topic.name}
                   </.link>
