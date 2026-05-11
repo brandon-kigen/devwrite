@@ -296,6 +296,7 @@ defmodule BlogWeb.UserLive.Registration do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
         Accounts.deliver_login_instructions(user, fn token -> url(~p"/users/log-in/#{token}") end)
+
         {:noreply,
          socket
          |> put_flash(:info, "Account created! Sign in to continue.")

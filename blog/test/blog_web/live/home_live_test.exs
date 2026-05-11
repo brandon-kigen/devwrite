@@ -11,11 +11,11 @@ defmodule BlogWeb.HomeLiveTest do
       assert html =~ "Modern Builders"
       assert html =~ "View Examples"
     end
-    
+
     test "redirects to feed if already logged in", %{conn: conn} do
       user = Blog.AccountsFixtures.user_fixture()
       conn = log_in_user(conn, user)
-      
+
       assert {:error, {:redirect, %{to: "/feed"}}} = live(conn, ~p"/")
     end
   end

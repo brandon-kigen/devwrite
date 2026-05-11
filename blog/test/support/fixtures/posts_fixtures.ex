@@ -11,13 +11,16 @@ defmodule Blog.PostsFixtures do
   """
   def post_fixture(attrs \\ %{}) do
     user = attrs[:user] || AccountsFixtures.user_fixture()
-    
+
     {:ok, post} =
-      Blog.Posts.create_post(user, Enum.into(attrs, %{
-        body: "some body with at least twenty characters",
-        title: "some title",
-        published_at: DateTime.utc_now()
-      }))
+      Blog.Posts.create_post(
+        user,
+        Enum.into(attrs, %{
+          body: "some body with at least twenty characters",
+          title: "some title",
+          published_at: DateTime.utc_now()
+        })
+      )
 
     post
   end
@@ -27,13 +30,16 @@ defmodule Blog.PostsFixtures do
   """
   def draft_post_fixture(attrs \\ %{}) do
     user = attrs[:user] || AccountsFixtures.user_fixture()
-    
+
     {:ok, post} =
-      Blog.Posts.create_post(user, Enum.into(attrs, %{
-        body: "some draft body with enough characters",
-        title: "draft title",
-        published_at: nil
-      }))
+      Blog.Posts.create_post(
+        user,
+        Enum.into(attrs, %{
+          body: "some draft body with enough characters",
+          title: "draft title",
+          published_at: nil
+        })
+      )
 
     post
   end
@@ -44,8 +50,8 @@ defmodule Blog.PostsFixtures do
   def comment_fixture(attrs \\ %{}) do
     user = attrs[:user] || AccountsFixtures.user_fixture()
     post = attrs[:post] || post_fixture(user: user)
-    
-    clean_attrs = 
+
+    clean_attrs =
       attrs
       |> Enum.into(%{})
       |> Map.drop([:user, :post])

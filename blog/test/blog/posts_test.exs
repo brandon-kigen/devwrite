@@ -14,7 +14,7 @@ defmodule Blog.PostsTest do
     test "list_posts/0 returns all published posts", %{user: user} do
       post = post_fixture(user: user)
       draft = draft_fixture(user)
-      
+
       posts = Posts.list_posts()
       assert Enum.any?(posts, &(&1.id == post.id))
       refute Enum.any?(posts, &(&1.id == draft.id))
@@ -25,7 +25,7 @@ defmodule Blog.PostsTest do
       draft = draft_fixture(user)
       other_user = user_fixture()
       other_post = post_fixture(user: other_user)
-      
+
       posts = Posts.list_posts_for_user(user)
       assert Enum.any?(posts, &(&1.id == post.id))
       assert Enum.any?(posts, &(&1.id == draft.id))
@@ -65,7 +65,7 @@ defmodule Blog.PostsTest do
       owner = user_fixture()
       other_user = user_fixture()
       post = post_fixture(user: owner)
-      
+
       assert {:error, :unauthorized} = Posts.update_post(other_user, post, %{title: "updated"})
     end
 
@@ -79,17 +79,17 @@ defmodule Blog.PostsTest do
       owner = user_fixture()
       other_user = user_fixture()
       post = post_fixture(user: owner)
-      
+
       assert {:error, :unauthorized} = Posts.delete_post(other_user, post)
     end
 
     test "increment_view_count/1 increments the view count", %{user: user} do
       post = post_fixture(user: user)
       assert post.view_count == 0
-      
+
       Posts.increment_view_count(post.id)
       updated_post = Posts.get_post!(post.id)
-      
+
       assert updated_post.view_count == 1
     end
   end
@@ -104,7 +104,7 @@ defmodule Blog.PostsTest do
     test "create_comment/3 with valid data creates a comment", %{user: user, post: post} do
       Phoenix.PubSub.subscribe(Blog.PubSub, "post:#{post.id}")
       valid_attrs = %{"body" => "some valid comment body"}
-      
+
       assert {:ok, %Posts.Comment{} = comment} = Posts.create_comment(user, post.id, valid_attrs)
       assert comment.body == "some valid comment body"
       assert comment.post_id == post.id
@@ -122,12 +122,12 @@ defmodule Blog.PostsTest do
       comment = comment_fixture(user: user, post: post)
       assert {:ok, %Posts.Comment{}} = Posts.delete_comment(user, comment)
     end
-    
+
     test "delete_comment/2 fails if user is not the owner", %{post: post} do
       owner = user_fixture()
       other_user = user_fixture()
       comment = comment_fixture(user: owner, post: post)
-      
+
       assert {:error, :unauthorized} = Posts.delete_comment(other_user, comment)
     end
   end
@@ -142,7 +142,7 @@ defmodule Blog.PostsTest do
     test "like_post/2 creates a like and handles duplicates", %{user: user, post: post} do
       assert {:ok, %Posts.Like{}} = Posts.like_post(user, post.id)
       assert Posts.liked_by?(user, post.id)
-      
+
       # Should ignore duplicate like
       assert {:ok, %Posts.Like{}} = Posts.like_post(user, post.id)
       assert Posts.like_count(post.id) == 1
@@ -151,25 +151,25 @@ defmodule Blog.PostsTest do
     test "unlike_post/2 removes a like", %{user: user, post: post} do
       Posts.like_post(user, post.id)
       assert Posts.liked_by?(user, post.id)
-      
+
       {1, nil} = Posts.unlike_post(user, post.id)
       refute Posts.liked_by?(user, post.id)
     end
-    
+
     test "like_count/1 returns correct count", %{post: post} do
       user1 = user_fixture()
       user2 = user_fixture()
-      
+
       assert Posts.like_count(post.id) == 0
-      
+
       Posts.like_post(user1, post.id)
       assert Posts.like_count(post.id) == 1
-      
+
       Posts.like_post(user2, post.id)
       assert Posts.like_count(post.id) == 2
     end
   end
-  
+
   # Helper for draft fixture
   defp draft_fixture(user) do
     draft_post_fixture(user: user)

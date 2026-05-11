@@ -18,18 +18,18 @@ defmodule BlogWeb.FeedLiveTest do
       # Both published posts should be visible
       assert html =~ post1.title
       assert html =~ post2.title
-      
+
       # Draft should not be visible
       refute html =~ "This is a draft"
     end
-    
+
     test "feed requires authentication to view full features but shows posts", %{conn: conn} do
       user = user_fixture()
       post = post_fixture(user: user)
-      
+
       conn = log_in_user(conn, user)
       {:ok, _feed_live, html} = live(conn, ~p"/feed")
-      
+
       # Post is visible to guests
       assert html =~ post.title
     end
