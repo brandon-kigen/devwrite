@@ -4,7 +4,7 @@
 <header class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md shadow-sm">
   <nav class="flex justify-between items-center max-w-container-max mx-auto px-md h-16">
     <%!-- Brand --%>
-    <div class="flex-shrink-0 flex items-center gap-2">
+    <div class="shrink-0 flex items-center gap-2">
       <span
         class="material-symbols-outlined text-primary text-3xl"
         style='font-variation-settings: "FILL" 1'
@@ -117,7 +117,7 @@
 </header>
 
 <%!-- ═══ Main Content ═══════════════════════════════════════════════════════════ --%>
-<main class="flex-grow pt-24 pb-xl">
+<main class="grow pt-24 pb-xl">
   <%!-- ─── Hero Section ─────────────────────────────────────────────────────── --%>
   <section class="max-w-container-max mx-auto px-md py-xl md:py-20 text-center flex flex-col items-center">
     <%!-- Badge --%>
@@ -136,7 +136,7 @@
     <%!-- Headline --%>
     <h1 class="font-h1 text-h1 font-extrabold text-on-surface max-w-4xl mx-auto mb-6">
       The Technical Blog for <br class="hidden md:block" />
-      <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#F05032]">
+      <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-[#F05032]">
         Modern Builders
       </span>.
     </h1>
@@ -258,7 +258,7 @@
           class="w-full h-48 object-cover border-b border-outline-variant"
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu-YkA0LhE2mgluRXeRLFXU6XvYStf_JwJxD2Q-vQodoyFvHjH80kUZjSSe5TY4BP_eISiQHNn70EM4LXAH8eUU2cV070xlOTGz2YzzJZpRp9DIklkrbQytY4c9K91fcLbFcMnFXDswSAnOp3ubge5YLV8H89CHTssZ4atPmOIexdBg_Mdw6yORDP3YUJ4qc2zAEdXq0teCcZDTTneD-xB2x3i9eOM_vacOJQ5pW9jT1G40MaapK9XC2RpzTU0U2Qtut_FssXJUgA"
         />
-        <div class="p-6 flex flex-col flex-grow">
+        <div class="p-6 flex flex-col grow">
           <div class="flex gap-2 mb-3">
             <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-primary px-2 py-1 rounded">
               ARCHITECTURE
@@ -270,7 +270,7 @@
           <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-2 hover:text-primary transition-colors cursor-pointer">
             Building Resilient Microservices
           </h3>
-          <p class="font-ui-body text-ui-body text-on-surface-variant mb-4 flex-grow">
+          <p class="font-ui-body text-ui-body text-on-surface-variant mb-4 grow">
             An exploration of circuit breakers, retry mechanisms, and graceful
             degradation strategies in modern distributed systems.
           </p>
@@ -295,7 +295,7 @@
           class="w-full h-48 object-cover border-b border-outline-variant"
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGm5C4CJis0M_u_WapG5ZNypZfA9EJMP6uOISxbxi_KVVUvYkQFewPIgNjm3gthfanjAWCkI453xHeyAb92fUn4jJER080kCP9SFt5P5JwYeUbYh0vn4s1mqx_eb15sWnnL99uJnnfqYSdbryi9CMS6ePgkc7CzgvSJ9O3-8nGOy2yh336pAsAwyi109Kv-lGF6QoYY6zJ7162dMgXLZwfHPQ5HGsdmafopAkzSkaLQYGtYQ5Mxr0FakWFTPHYe_gJSdWbPonU7TI"
         />
-        <div class="p-6 flex flex-col flex-grow">
+        <div class="p-6 flex flex-col grow">
           <div class="flex gap-2 mb-3">
             <span class="font-ui-label text-[12px] font-semibold bg-surface-container text-primary px-2 py-1 rounded">
               PERFORMANCE
@@ -307,7 +307,7 @@
           <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-2 hover:text-primary transition-colors cursor-pointer">
             Optimizing React Context
           </h3>
-          <p class="font-ui-body text-ui-body text-on-surface-variant mb-4 flex-grow">
+          <p class="font-ui-body text-ui-body text-on-surface-variant mb-4 grow">
             Techniques to prevent unnecessary re-renders when passing complex
             state objects down the component tree.
           </p>

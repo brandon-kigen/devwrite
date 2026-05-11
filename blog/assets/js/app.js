@@ -24,8 +24,6 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import { hooks as colocatedHooks } from "phoenix-colocated/blog";
 import topbar from "../vendor/topbar";
-import "trix/dist/trix.esm.js";
-import "trix/dist/trix.css";
 
 
 // ═══════════════════════════════════════════════════════════════════════════
