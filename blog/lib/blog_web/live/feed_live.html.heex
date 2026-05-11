@@ -184,9 +184,9 @@
                 <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-xs group-hover:text-primary transition-colors line-clamp-2">
                   {post.title}
                 </h3>
-                <p class="font-ui-body text-ui-body text-on-surface-variant line-clamp-4 mb-sm">
-                  {String.slice(post.body, 0, 150)}...
-                </p>
+                <div class="font-ui-body text-ui-body text-on-surface-variant prose-content line-clamp-4 mb-sm">
+                  {raw(String.slice(post.body, 0, 150))}
+                </div>
               </div>
             </div>
 

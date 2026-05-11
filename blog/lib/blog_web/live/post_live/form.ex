@@ -245,9 +245,14 @@ defmodule BlogWeb.PostLive.Form do
   defp save_post(:create, socket, post_params) do
     case Posts.create_post(socket.assigns.current_scope.user, post_params) do
       {:ok, post} ->
+        message =
+          if socket.assigns.publish_now,
+            do: "Post published successfully!",
+            else: "Post saved to drafts!"
+
         {:noreply,
          socket
-         |> put_flash(:info, "Post created successfully!")
+         |> put_flash(:info, message)
          |> redirect(to: ~p"/posts/#{post.id}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -258,9 +263,14 @@ defmodule BlogWeb.PostLive.Form do
   defp save_post(:update, socket, post_params) do
     case Posts.update_post(socket.assigns.current_scope.user, socket.assigns.post, post_params) do
       {:ok, post} ->
+        message =
+          if socket.assigns.publish_now,
+            do: "Post published successfully!",
+            else: "Post saved to drafts!"
+
         {:noreply,
          socket
-         |> put_flash(:info, "Post updated successfully!")
+         |> put_flash(:info, message)
          |> redirect(to: ~p"/posts/#{post.id}")}
 
       {:error, :unauthorized} ->
@@ -424,7 +434,7 @@ defmodule BlogWeb.PostLive.Form do
               type="submit"
               class="btn btn-primary font-ui-label text-ui-label font-bold px-lg py-sm"
             >
-              {if @live_action == :new, do: "Publish Post", else: "Save Changes"}
+              {if @publish_now, do: "Publish", else: "Save Draft"}
             </button>
           </div>
         </form>

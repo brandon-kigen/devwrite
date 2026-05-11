@@ -153,7 +153,7 @@ defmodule Blog.Posts.Post do
     post
     |> cast(attrs, [:title, :body, :published_at])
     |> validate_required([:title, :body])
-    |> validate_length(:title, min: 5, max: 200)
-    |> validate_length(:body, min: 20)
+    |> validate_length(:title, min: 5, max: 200, message: "should be between 5 and 200 character(s)")
+    |> validate_length(:body, min: 20, message: "should be at least 20 character(s)")
   end
 end

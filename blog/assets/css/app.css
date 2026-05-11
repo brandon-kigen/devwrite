@@ -2,7 +2,7 @@
    https://tailwindcss.com/docs/configuration */
 
 @import "tailwindcss" source(none);
-@import "trix/dist/trix.css";
+@import "../node_modules/trix/dist/trix.css";
 @source "../css";
 @source "../js";
 @source "../../lib/blog_web";
@@ -257,21 +257,41 @@
 
 /* ─── Trix Editor Overrides ────────────────────────────────────────────── */
 trix-editor {
-  border: none;
-  padding: 0;
+  border: 1px solid var(--color-outline-variant);
+  padding: var(--spacing-md);
   min-height: 300px;
   font-family: var(--font-prose-body);
+  border-radius: var(--radius-field);
+}
+
+trix-editor a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+trix-editor a:hover {
+  color: var(--color-primary-variant);
+  text-decoration: underline wavy;
+}
+
+trix-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 trix-toolbar .trix-button-group {
   border-color: var(--color-outline-variant);
   border-radius: var(--radius-field);
-  margin-bottom: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 trix-toolbar .trix-button {
   border-color: var(--color-outline-variant);
   color: var(--color-on-surface);
+  flex-shrink: 0;
 }
 
 trix-toolbar .trix-button:hover {
