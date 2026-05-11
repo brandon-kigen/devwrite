@@ -2,6 +2,7 @@
    https://tailwindcss.com/docs/configuration */
 
 @import "tailwindcss" source(none);
+@import "trix/dist/trix.css";
 @source "../css";
 @source "../js";
 @source "../../lib/blog_web";
@@ -169,6 +170,8 @@
   --spacing-base: 4px;
   --spacing-prose-max: 720px;
   --spacing-container-max: 1200px;
+
+
 }
 
 /* ─── Compound typography utilities ────────────────────────────────────────── */
@@ -215,10 +218,10 @@
 /* ─── Auth page utilities (from design) ────────────────────────────────────── */
 @utility focus-ring {
   transition: all 0.2s;
+
   &:focus-within {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px
-      color-mix(in srgb, var(--color-primary) 20%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
   }
 }
 
@@ -248,5 +251,34 @@
 /* DaisyUI's toast-top anchors at top:0, which sits under our z-50 fixed nav.   */
 /* Our header is always h-16 (4rem / 64px), so we offset by the same amount.    */
 .toast.toast-top {
-  top: 4.5rem; /* header height + a little breathing room */
+  top: 4.5rem;
+  /* header height + a little breathing room */
+}
+
+/* ─── Trix Editor Overrides ────────────────────────────────────────────── */
+trix-editor {
+  border: none;
+  padding: 0;
+  min-height: 300px;
+  font-family: var(--font-prose-body);
+}
+
+trix-toolbar .trix-button-group {
+  border-color: var(--color-outline-variant);
+  border-radius: var(--radius-field);
+  margin-bottom: 0.5rem;
+}
+
+trix-toolbar .trix-button {
+  border-color: var(--color-outline-variant);
+  color: var(--color-on-surface);
+}
+
+trix-toolbar .trix-button:hover {
+  background: var(--color-surface-container);
+}
+
+trix-toolbar .trix-button.trix-active {
+  background: var(--color-primary-container);
+  color: var(--color-on-primary-container);
 }

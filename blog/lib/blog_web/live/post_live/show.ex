@@ -346,7 +346,7 @@ defmodule BlogWeb.PostLive.Show do
               >
                 <%!-- Account info --%>
                 <div class="px-sm py-xs border-b border-outline-variant">
-                  <p class="font-ui-label text-[11px] font-semibold text-outline uppercase tracking-wider mb-[2px]">
+                  <p class="font-ui-label text-[11px] font-semibold text-outline uppercase tracking-wider mb-0.5">
                     Signed in as
                   </p>
                   <p class="font-ui-body text-ui-body text-on-surface truncate">
@@ -398,9 +398,12 @@ defmodule BlogWeb.PostLive.Show do
         <header class="mb-lg">
           <div class="flex items-center gap-xs mb-md">
             <%= for topic <- @post.topics do %>
-              <span class="inline-flex items-center px-2 py-1 rounded bg-secondary-container text-on-secondary-container font-ui-label text-ui-label uppercase text-xs">
-                {topic}
-              </span>
+              <.link
+                href={~p"/topics/#{topic.id}"}
+                class="inline-flex items-center px-2 py-1 rounded bg-secondary-container text-on-secondary-container font-ui-label text-ui-label uppercase text-xs hover:opacity-80 transition-opacity"
+              >
+                {topic.name}
+              </.link>
             <% end %>
           </div>
           <h1 class="font-h1 text-h1 text-on-background mb-sm">
@@ -429,7 +432,7 @@ defmodule BlogWeb.PostLive.Show do
 
         <%!-- Prose Body --%>
         <div class="font-prose-body text-prose-body text-on-background space-y-md prose-content">
-          {raw(parse_markdown(@post.body))}
+          {raw(@post.body)}
         </div>
 
         <%!-- Action Bar & Interaction Section --%>
@@ -576,14 +579,5 @@ defmodule BlogWeb.PostLive.Show do
       </article>
     </main>
     """
-  end
-
-  defp parse_markdown(body) do
-    # Simple markdown parsing - replace common patterns
-    body
-    |> String.replace("\n\n", "</p><p>")
-    |> String.replace("\n", "<br/>")
-    |> then(&"<p>#{&1}</p>")
-    |> String.replace("<p></p>", "")
   end
 end

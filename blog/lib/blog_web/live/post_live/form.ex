@@ -149,13 +149,19 @@ defmodule BlogWeb.PostLive.Form do
     else
       changeset = Posts.change_post(post)
 
+      # Convert topics to comma-separated string for form display
+      topics_string =
+        post.topics
+        |> Enum.map(& &1.name)
+        |> Enum.join(", ")
+
       {:noreply,
        socket
        |> assign(post: post)
        |> assign(changeset: changeset)
        |> assign(form_title: post.title)
        |> assign(form_body: post.body)
-       |> assign(form_topics: Enum.join(post.topics, ", "))
+       |> assign(form_topics: topics_string)
        |> assign(published_at: post.published_at)
        |> assign(publish_now: false)}
     end
@@ -335,19 +341,27 @@ defmodule BlogWeb.PostLive.Form do
               </div>
 
               <%!-- Body Field --%>
+              <%!-- Body Field --%>
               <div>
-                <label for="body" class="block font-ui-label text-ui-label text-on-surface mb-xs">
+                <label for="post_body" class="block font-ui-label text-ui-label text-on-surface mb-xs">
                   Content
                 </label>
-                <textarea
-                  id="body"
-                  name="post[body]"
-                  placeholder="Write your post content here..."
-                  rows="12"
-                  class="w-full px-md py-sm rounded-lg border border-outline-variant bg-surface text-on-surface font-ui-body text-ui-body focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none"
+
+                <%!-- phx-update="ignore" tells LiveView to leave this section alone after mount --%>
+                <div
+                  phx-update="ignore"
+                  id="trix-editor-wrapper"
+                  phx-hook="TrixEditor"
+                  data-input-id="post_body"
                 >
-                  <%= @form_body %>
-                </textarea>
+                  <input id="post_body" type="hidden" name="post[body]" value={@form_body} />
+                  <trix-editor
+                    input="post_body"
+                    class="trix-content rounded-lg border border-outline-variant bg-surface text-on-surface font-prose-body min-h-[300px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary px-md py-sm"
+                  >
+                  </trix-editor>
+                </div>
+
                 <%= if @changeset.errors[:body] do %>
                   <span class="text-error font-ui-label text-ui-label text-xs mt-xs block">
                     {elem(@changeset.errors[:body], 0)}

@@ -100,9 +100,12 @@ defmodule BlogWeb.PostLive.Index do
                   <div class="flex-1">
                     <div class="mb-md flex flex-wrap gap-xs">
                       <%= for topic <- post.topics do %>
-                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-ui-label bg-secondary-container text-on-secondary-container uppercase">
-                          {topic}
-                        </span>
+                        <.link
+                          href={~p"/topics/#{topic.id}"}
+                          class="inline-flex items-center px-2 py-1 rounded text-xs font-ui-label bg-secondary-container text-on-secondary-container uppercase hover:opacity-80 transition-opacity"
+                        >
+                          {topic.name}
+                        </.link>
                       <% end %>
                     </div>
                     <h2 class="font-h3 text-h3 text-on-surface mb-sm group-hover:text-primary transition-colors line-clamp-2">

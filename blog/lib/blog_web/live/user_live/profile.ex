@@ -203,7 +203,7 @@ defmodule BlogWeb.UserLive.Profile do
                       <div class="mb-md flex flex-wrap gap-xs">
                         <%= for topic <- post.topics do %>
                           <span class="inline-flex items-center px-2 py-1 rounded text-xs font-ui-label bg-secondary-container text-on-secondary-container uppercase">
-                            {topic}
+                            {topic.name}
                           </span>
                         <% end %>
                       </div>

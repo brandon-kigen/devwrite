@@ -45,6 +45,7 @@ config :swoosh, :api_client, Swoosh.ApiClient.Hackney
 config :esbuild,
   version: "0.25.4",
   blog: [
+    # Removed --node-paths
     args:
       ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets/js --external:/fonts/* --external:/images/* --alias:@=.),
     cd: Path.expand("../assets", __DIR__),
