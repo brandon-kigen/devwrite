@@ -53,6 +53,8 @@ defmodule Blog.Posts do
   alias Blog.Posts.Post
   alias Blog.Posts.Comment
   alias Blog.Posts.Like
+  alias Blog.Posts.Topic
+  alias Blog.Posts.PostsTopic
   alias Blog.Accounts.User
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -66,7 +68,7 @@ defmodule Blog.Posts do
     Post
     |> where([p], not is_nil(p.published_at))
     |> order_by([p], desc: p.inserted_at)
-    |> preload(:user)
+    |> preload([:user, :topics])
     |> Repo.all()
   end
 
@@ -77,7 +79,7 @@ defmodule Blog.Posts do
     Post
     |> where([p], p.user_id == ^user.id)
     |> order_by([p], desc: p.inserted_at)
-    |> preload(:user)
+    |> preload([:user, :topics])
     |> Repo.all()
   end
 
@@ -87,29 +89,56 @@ defmodule Blog.Posts do
   def get_post!(id) do
     Post
     |> where([p], p.id == ^id)
-    |> preload(user: [], comments: :user)
+    |> preload([:user, :topics, comments: :user])
     |> Repo.one!()
   end
 
   @doc """
-  Creates a post for a given user.
+  Creates a post for a given user with topic associations.
+  Extracts topics from attrs as a list, creates/finds topics, and links them.
   """
   def create_post(%User{} = user, attrs \\ %{}) do
-    %Post{}
-    |> Post.changeset(attrs)
-    |> Ecto.Changeset.put_assoc(:user, user)
-    |> Repo.insert()
+    # Extract topics before creating post
+    topics = Map.get(attrs, "topics", []) || []
+    attrs_without_topics = Map.delete(attrs, "topics")
+
+    changeset =
+      %Post{}
+      |> Post.changeset(sanitize_post_attrs(attrs_without_topics))
+      |> Ecto.Changeset.put_assoc(:user, user)
+
+    case Repo.insert(changeset) do
+      {:ok, post} ->
+        # Create topic associations
+        post = create_post_topics(post, topics)
+        {:ok, post}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
 
   @doc """
-  Updates a post if the user owns it.
+  Updates a post if the user owns it, including topic associations.
   Returns {:error, :unauthorized} if the user doesn't own the post.
   """
   def update_post(%User{} = user, %Post{} = post, attrs) do
     if post.user_id == user.id do
-      post
-      |> Post.changeset(attrs)
-      |> Repo.update()
+      topics = Map.get(attrs, "topics", []) || []
+      attrs_without_topics = Map.delete(attrs, "topics")
+
+      case post
+           |> Post.changeset(sanitize_post_attrs(attrs_without_topics))
+           |> Repo.update() do
+        {:ok, post} ->
+          # Delete old topic associations and create new ones
+          Repo.delete_all(from(pt in PostsTopic, where: pt.post_id == ^post.id))
+          post = create_post_topics(post, topics)
+          {:ok, post}
+
+        {:error, changeset} ->
+          {:error, changeset}
+      end
     else
       {:error, :unauthorized}
     end
@@ -235,5 +264,149 @@ defmodule Blog.Posts do
     Like
     |> where([l], l.post_id == ^post_id)
     |> Repo.aggregate(:count)
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # TOPICS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @doc """
+  Gets or creates a topic by name (normalized to lowercase).
+  Returns {:ok, topic} or {:error, changeset}.
+  """
+  def get_or_create_topic(name) when is_binary(name) do
+    normalized_name = name |> String.trim() |> String.downcase()
+
+    case Repo.get_by(Topic, name: normalized_name) do
+      %Topic{} = topic ->
+        {:ok, topic}
+
+      nil ->
+        %Topic{}
+        |> Topic.changeset(%{name: normalized_name})
+        |> Repo.insert()
+    end
+  end
+
+  @doc """
+  Returns all topics sorted by name.
+  """
+  def list_all_topics do
+    Topic
+    |> order_by(:name)
+    |> Repo.all()
+  end
+
+  @doc """
+  Searches for published posts by title or body using case-insensitive search.
+  """
+  def search_posts(query) when is_binary(query) and query != "" do
+    search_term = "%#{query}%"
+
+    Post
+    |> where([p], not is_nil(p.published_at))
+    |> where([p], ilike(p.title, ^search_term) or ilike(p.body, ^search_term))
+    |> order_by([p], desc: p.inserted_at)
+    |> preload([:user, :topics])
+    |> Repo.all()
+  end
+
+  def search_posts(_query) do
+    list_posts_with_topics()
+  end
+
+  @doc """
+  Returns all published posts with topics preloaded.
+  """
+  def list_posts_with_topics do
+    Post
+    |> where([p], not is_nil(p.published_at))
+    |> order_by([p], desc: p.inserted_at)
+    |> preload([:user, :topics])
+    |> Repo.all()
+  end
+
+  @doc """
+  Filters published posts by topic.
+  Returns posts with that topic, with topics and user preloaded.
+  """
+  def filter_posts_by_topic(topic_id) when is_integer(topic_id) and topic_id > 0 do
+    Post
+    |> join(:inner, [p], pt in PostsTopic, on: p.id == pt.post_id)
+    |> join(:inner, [_, pt], t in Topic, on: pt.topic_id == t.id)
+    |> where([p], not is_nil(p.published_at))
+    |> where([_, _, t], t.id == ^topic_id)
+    |> order_by([p], desc: p.inserted_at)
+    |> preload([:user, :topics])
+    |> distinct(true)
+    |> Repo.all()
+  end
+
+  def filter_posts_by_topic(_topic_id) do
+    list_posts_with_topics()
+  end
+
+  @doc """
+  Searches and filters posts by query and topic.
+  Both query and topic_id can be nil/empty to search/filter independently.
+  Returns published posts ordered by inserted_at DESC with topics and user preloaded.
+  """
+  def search_and_filter_posts(query, topic_id) do
+    search_term = if is_binary(query) and query != "", do: "%#{query}%", else: nil
+    use_topic_filter = is_integer(topic_id) and topic_id > 0
+
+    base_query =
+      Post
+      |> where([p], not is_nil(p.published_at))
+      |> order_by([p], desc: p.inserted_at)
+      |> preload([:user, :topics])
+
+    query =
+      if search_term do
+        base_query
+        |> where([p], ilike(p.title, ^search_term))
+      else
+        base_query
+      end
+
+    if use_topic_filter do
+      query
+      |> join(:inner, [p], pt in PostsTopic, on: p.id == pt.post_id)
+      |> where([_, pt], pt.topic_id == ^topic_id)
+      |> distinct(true)
+      |> Repo.all()
+    else
+      Repo.all(query)
+    end
+  end
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PRIVATE HELPERS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  defp create_post_topics(post, topics) do
+    Enum.each(topics, fn topic_name ->
+      case get_or_create_topic(topic_name) do
+        {:ok, topic} ->
+          Repo.insert(
+            %PostsTopic{post_id: post.id, topic_id: topic.id},
+            on_conflict: :nothing,
+            conflict_target: [:post_id, :topic_id]
+          )
+
+        {:error, _} ->
+          :ok
+      end
+    end)
+
+    # Reload post with topics preloaded
+    Repo.preload(post, :topics)
+  end
+
+  defp sanitize_post_attrs(attrs) do
+    case Map.get(attrs, "body") do
+      nil -> attrs
+      body -> Map.put(attrs, "body", HtmlSanitizeEx.basic_html(body))
+    end
   end
 end
