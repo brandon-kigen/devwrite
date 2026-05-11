@@ -52,7 +52,6 @@ defmodule Blog.Accounts.User do
     user
     |> email_changeset(attrs, opts)
     |> password_changeset(attrs, opts)
-    |> put_change(:confirmed_at, DateTime.utc_now(:second))
   end
 
   @doc """

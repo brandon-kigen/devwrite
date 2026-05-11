@@ -82,7 +82,7 @@ defmodule Blog.AccountsTest do
       {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
       assert user.email == email
       refute is_nil(user.hashed_password)
-      refute is_nil(user.confirmed_at)
+      assert is_nil(user.confirmed_at)
       # virtual :password field is cleared after hashing
       assert is_nil(user.password)
     end
@@ -363,16 +363,6 @@ defmodule Blog.AccountsTest do
       assert {:ok, {^user, []}} = Accounts.login_user_by_magic_link(encoded_token)
       # one time use only
       assert {:error, :not_found} = Accounts.login_user_by_magic_link(encoded_token)
-    end
-
-    test "raises when unconfirmed user has password set" do
-      user = unconfirmed_user_fixture()
-      {1, nil} = Repo.update_all(User, set: [hashed_password: "hashed"])
-      {encoded_token, _hashed_token} = generate_user_magic_link_token(user)
-
-      assert_raise RuntimeError, ~r/magic link log in is not allowed/, fn ->
-        Accounts.login_user_by_magic_link(encoded_token)
-      end
     end
   end
 

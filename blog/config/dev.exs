@@ -55,6 +55,8 @@ config :blog, BlogWeb.Endpoint,
 # configured to run both http and https servers on
 # different ports.
 
+config :blog, Blog.Mailer, adapter: Swoosh.Adapters.Local
+
 # Reload browser tabs when matching files change.
 config :blog, BlogWeb.Endpoint,
   live_reload: [

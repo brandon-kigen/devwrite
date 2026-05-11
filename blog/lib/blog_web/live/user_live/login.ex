@@ -283,7 +283,7 @@ defmodule BlogWeb.UserLive.Login do
     if user = Accounts.get_user_by_email(email) do
       Accounts.deliver_login_instructions(
         user,
-        &url(~p"/users/log-in/#{&1}")
+        fn token -> url(~p"/users/log-in/#{token}") end
       )
     end
 

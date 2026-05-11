@@ -40,6 +40,7 @@ defmodule Blog.AccountsFixtures do
   """
   def user_fixture(attrs \\ %{}) do
     {:ok, user} = Accounts.register_user(valid_user_attributes(attrs))
+    {:ok, user} = Blog.Repo.update(Blog.Accounts.User.confirm_changeset(user))
     user
   end
 
