@@ -15,6 +15,9 @@ defmodule BlogWeb.FeedLive do
   - Click "New Post" to create post
   - User profile dropdown with initial avatar
   - Logout functionality in dropdown
+  - Real-time search by post title/body
+  - Filter by topic
+  - Clear filters button
 
   ## State Management
 
@@ -24,6 +27,9 @@ defmodule BlogWeb.FeedLive do
   - `user_initial` — First letter of email (for avatar)
   - `profile_open` — Boolean for dropdown visibility
   - `page_title` — Browser tab title
+  - `all_topics` — List of all topics for dropdown
+  - `search_query` — Current search query string
+  - `selected_topic_id` — Currently selected topic filter (nil if none)
 
   ### Authentication
 
@@ -44,6 +50,9 @@ defmodule BlogWeb.FeedLive do
 
   - `toggle_profile` — Toggle user dropdown menu
   - `close_profile` — Close user dropdown menu
+  - `search` — Search posts by title/body (triggered by input)
+  - `filter_topic` — Filter posts by topic (triggered by dropdown)
+  - `clear_filters` — Clear all search and topic filters
   """
 
   use BlogWeb, :live_view
@@ -60,12 +69,10 @@ defmodule BlogWeb.FeedLive do
       |> String.first()
       |> String.upcase()
 
-    posts = Posts.list_posts()
-    # Preload like counts for each post
-    posts_with_likes =
-      Enum.map(posts, fn post ->
-        {post, Posts.like_count(post.id)}
-      end)
+    # Get initial posts and all topics
+    posts = Posts.search_and_filter_posts("", nil)
+    posts_with_likes = Enum.map(posts, fn post -> {post, Posts.like_count(post.id)} end)
+    all_topics = Posts.list_all_topics()
 
     {:ok,
      socket
@@ -73,7 +80,10 @@ defmodule BlogWeb.FeedLive do
      |> assign(:user_email, user.email)
      |> assign(:user_initial, user_initial)
      |> assign(:profile_open, false)
-     |> assign(:posts, posts_with_likes)}
+     |> assign(:posts, posts_with_likes)
+     |> assign(:all_topics, all_topics)
+     |> assign(:search_query, "")
+     |> assign(:selected_topic_id, nil)}
   end
 
   @impl true
@@ -84,5 +94,44 @@ defmodule BlogWeb.FeedLive do
   @impl true
   def handle_event("close_profile", _params, socket) do
     {:noreply, assign(socket, :profile_open, false)}
+  end
+
+  @impl true
+  def handle_event("search", %{"query" => query}, socket) do
+    # Decouple: search resets topic filter
+    posts = Posts.search_and_filter_posts(query, nil)
+    posts_with_likes = Enum.map(posts, fn post -> {post, Posts.like_count(post.id)} end)
+
+    {:noreply,
+     socket
+     |> assign(:search_query, query)
+     |> assign(:selected_topic_id, nil)
+     |> assign(:posts, posts_with_likes)}
+  end
+
+  @impl true
+  def handle_event("filter_topic", %{"topic_id" => topic_id_str}, socket) do
+    # Decouple: topic filter resets search
+    topic_id = if topic_id_str == "", do: nil, else: String.to_integer(topic_id_str)
+    posts = Posts.search_and_filter_posts("", topic_id)
+    posts_with_likes = Enum.map(posts, fn post -> {post, Posts.like_count(post.id)} end)
+
+    {:noreply,
+     socket
+     |> assign(:selected_topic_id, topic_id)
+     |> assign(:search_query, "")
+     |> assign(:posts, posts_with_likes)}
+  end
+
+  @impl true
+  def handle_event("clear_filters", _params, socket) do
+    posts = Posts.search_and_filter_posts("", nil)
+    posts_with_likes = Enum.map(posts, fn post -> {post, Posts.like_count(post.id)} end)
+
+    {:noreply,
+     socket
+     |> assign(:search_query, "")
+     |> assign(:selected_topic_id, nil)
+     |> assign(:posts, posts_with_likes)}
   end
 end

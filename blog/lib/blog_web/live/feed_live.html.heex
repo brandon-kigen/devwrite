@@ -11,14 +11,20 @@
       >
         DevWrite
       </a>
-      <div class="hidden md:flex items-center bg-surface-variant/50 rounded-full px-xs py-[4px] border border-outline-variant/30">
+      <form
+        phx-change="search"
+        class="hidden md:flex items-center bg-surface-variant/50 rounded-full px-xs py-[4px] border border-outline-variant/30"
+      >
         <span class="material-symbols-outlined text-outline text-[20px] ml-xs">search</span>
         <input
           class="bg-transparent border-none focus:ring-0 font-ui-label text-ui-label text-on-surface placeholder:text-outline w-48"
           placeholder="Search..."
           type="text"
+          name="query"
+          value={@search_query}
+          phx-debounce="300"
         />
-      </div>
+      </form>
     </div>
 
     <%!-- Navigation links — Feed is active --%>
@@ -110,13 +116,30 @@
         The latest technical stories from the writers and tags you follow.
       </p>
     </div>
-    <div class="flex gap-xs">
-      <button class="bg-surface-container text-primary font-ui-label text-ui-label font-semibold px-sm py-[6px] rounded-full border border-outline-variant hover:bg-surface-variant transition-colors flex items-center gap-[4px]">
-        <span class="material-symbols-outlined text-[18px]">filter_list</span> Filter
-      </button>
-      <button class="bg-surface-container text-primary font-ui-label text-ui-label font-semibold px-sm py-[6px] rounded-full border border-outline-variant hover:bg-surface-variant transition-colors flex items-center gap-[4px]">
-        <span class="material-symbols-outlined text-[18px]">sort</span> Top
-      </button>
+    <div class="flex gap-xs items-center">
+      <form phx-change="filter_topic">
+        <select
+          class="bg-surface-container text-on-surface font-ui-label text-ui-label font-semibold px-sm py-[6px] rounded-full border border-outline-variant hover:bg-surface-variant transition-colors"
+          name="topic_id"
+          value={@selected_topic_id || ""}
+        >
+          <option value="">All Topics</option>
+          <%= for topic <- @all_topics do %>
+            <option value={topic.id} selected={topic.id == @selected_topic_id}>
+              {topic.name}
+            </option>
+          <% end %>
+        </select>
+      </form>
+
+      <%= if @search_query != "" or @selected_topic_id do %>
+        <button
+          phx-click="clear_filters"
+          class="bg-error-container text-error font-ui-label text-ui-label font-semibold px-sm py-[6px] rounded-full border border-outline-variant hover:bg-error/20 transition-colors"
+        >
+          Clear Filters
+        </button>
+      <% end %>
     </div>
   </section>
 
@@ -137,17 +160,27 @@
       </div>
     <% else %>
       <%= for {post, like_count} <- @posts do %>
-        <.link href={~p"/posts/#{post.id}"} class="group">
-          <article class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest hover:shadow-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer h-full">
-            <div class="p-sm flex-1 flex flex-col justify-between bg-surface-container-low">
-              <div>
-                <div class="flex gap-xs mb-sm">
-                  <%= for topic <- post.topics do %>
-                    <span class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider">
-                      {topic}
-                    </span>
-                  <% end %>
-                </div>
+        <article class="relative bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest hover:shadow-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col h-full group">
+          <div class="p-sm flex-1 flex flex-col justify-between bg-surface-container-low">
+            <div>
+              <div class="relative z-10 flex flex-wrap gap-xs mb-sm">
+                <%= for topic <- post.topics do %>
+                  <.link
+                    href={~p"/topics/#{topic.id}"}
+                    class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider hover:opacity-80 transition-opacity"
+                  >
+                    {topic.name}
+                  </.link>
+                <% end %>
+              </div>
+
+              <div class="relative">
+                <.link
+                  href={~p"/posts/#{post.id}"}
+                  class="absolute inset-0 z-0"
+                  aria-label={"View post: #{post.title}"}
+                >
+                </.link>
                 <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-xs group-hover:text-primary transition-colors line-clamp-2">
                   {post.title}
                 </h3>
@@ -155,26 +188,27 @@
                   {String.slice(post.body, 0, 150)}...
                 </p>
               </div>
-              <div class="flex items-center justify-between pt-sm mt-auto">
-                <div class="flex items-center gap-xs">
-                  <div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-xs font-bold">
-                    {String.first(post.user.email)}
-                  </div>
-                  <span class="font-ui-label text-ui-label font-semibold text-on-surface">
-                    {String.split(post.user.email, "@") |> List.first()}
-                  </span>
-                  <span class="text-outline text-[12px]">
-                    {Calendar.strftime(post.published_at || post.inserted_at, "%b %d")}
-                  </span>
+            </div>
+
+            <div class="flex items-center justify-between pt-sm mt-auto relative z-10">
+              <div class="flex items-center gap-xs">
+                <div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-xs font-bold">
+                  {String.first(post.user.email)}
                 </div>
-                <span class="text-outline text-[12px] flex items-center gap-xs">
-                  <span class="material-symbols-outlined text-[14px]">visibility</span>
-                  {post.view_count}
+                <span class="font-ui-label text-ui-label font-semibold text-on-surface">
+                  {String.split(post.user.email, "@") |> List.first()}
+                </span>
+                <span class="text-outline text-[12px]">
+                  {Calendar.strftime(post.published_at || post.inserted_at, "%b %d")}
                 </span>
               </div>
+              <span class="text-outline text-[12px] flex items-center gap-xs">
+                <span class="material-symbols-outlined text-[14px]">visibility</span>
+                {post.view_count}
+              </span>
             </div>
-          </article>
-        </.link>
+          </div>
+        </article>
       <% end %>
     <% end %>
   </div>

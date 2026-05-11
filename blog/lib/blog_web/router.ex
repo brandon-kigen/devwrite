@@ -167,6 +167,7 @@ defmodule BlogWeb.Router do
       live("/users/log-in", UserLive.Login, :new)
       live("/users/log-in/:token", UserLive.Confirmation, :new)
       live("/posts/:id", PostLive.Show, :show)
+      live("/topics/:id", TopicLive, :show)
     end
 
     get("/posts", RedirectController, :posts)

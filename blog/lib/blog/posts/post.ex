@@ -17,11 +17,10 @@ defmodule Blog.Posts.Post do
     - Can contain markdown or plain text
     - Rendered as-is (no HTML processing)
 
-  - **topics** (array of strings) — Post tags/categories
-    - Optional, default empty array
-    - Example: ["elixir", "phoenix", "liveview"]
-    - Stored in database but not indexed/searchable
-    - Could be extended for filtering feed by topic
+  - **topics** (many-to-many) — Reusable topics/tags for categorization
+    - Linked via `posts_topics` join table
+    - Enables efficient filtering and searching by topic
+    - Topics are normalized to lowercase
 
   ### Engagement
   - **view_count** (integer) — Number of times post viewed
@@ -82,19 +81,16 @@ defmodule Blog.Posts.Post do
   - Title: 5-200 characters (minimum headline length, maximum readability)
   - Body: minimum 20 characters (prevents empty/trivial posts)
 
-  ## Topics Field
+  ## Topics
 
-  Currently stored but not utilized:
-  - Parsed from comma-separated string in form
-  - "elixir, phoenix" → ["elixir", "phoenix"]
-  - Stored in database as array
-  - Not indexed or searchable
-  - Could be extended for:
+  Topics are stored in a dedicated `topics` table:
+  - Reusable across multiple posts
+  - Unique names, normalized to lowercase
+  - Linked via `posts_topics` join table
+  - Enables features like:
     - Feed filtering (show posts by topic)
-    - Topic pages (all posts for tag)
-    - Related posts (find other posts with same topic)
-
-  Future enhancement opportunity.
+    - Topic browse pages (/topics/:id)
+    - Relational search
 
   ## View Count Tracking
 
@@ -141,20 +137,21 @@ defmodule Blog.Posts.Post do
   schema "posts" do
     field(:title, :string)
     field(:body, :string)
-    field(:topics, {:array, :string}, default: [])
     field(:view_count, :integer, default: 0)
     field(:published_at, :utc_datetime)
 
     belongs_to(:user, Blog.Accounts.User)
     has_many(:comments, Blog.Posts.Comment)
     has_many(:likes, Blog.Posts.Like)
+    has_many(:posts_topics, Blog.Posts.PostsTopic, on_delete: :delete_all)
+    has_many(:topics, through: [:posts_topics, :topic])
 
     timestamps(type: :utc_datetime)
   end
 
   def changeset(post, attrs) do
     post
-    |> cast(attrs, [:title, :body, :topics, :published_at])
+    |> cast(attrs, [:title, :body, :published_at])
     |> validate_required([:title, :body])
     |> validate_length(:title, min: 5, max: 200)
     |> validate_length(:body, min: 20)

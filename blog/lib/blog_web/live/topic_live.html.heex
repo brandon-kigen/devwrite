@@ -1,0 +1,129 @@
+<Layouts.flash_group flash={@flash} />
+
+<%!-- ═══ Fixed Navigation Header ════════════════════════════════════════════ --%>
+<header class="bg-surface/95 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant shadow-sm">
+  <div class="flex justify-between items-center max-w-container-max mx-auto px-md h-16">
+    <div class="flex items-center gap-sm">
+      <.link
+        href={~p"/"}
+        class="font-h3 text-[24px] leading-[1.4] font-black text-primary tracking-tight"
+      >
+        DevWrite
+      </.link>
+    </div>
+
+    <nav class="hidden md:flex items-center gap-lg">
+      <.link
+        href={~p"/feed"}
+        class="font-ui-label text-ui-label font-semibold text-on-surface-variant hover:text-primary hover:bg-primary-container/10 rounded-lg transition-all duration-200 px-sm py-xs"
+      >
+        Back to Feed
+      </.link>
+    </nav>
+
+    <div class="flex items-center gap-sm">
+      <.link
+        href={~p"/posts/new"}
+        class="font-ui-label text-ui-label font-bold bg-primary text-on-primary px-sm py-xs rounded-lg hover:shadow-md active:scale-95 transform transition-all duration-150"
+      >
+        New Post
+      </.link>
+    </div>
+  </div>
+</header>
+
+<%!-- ═══ Main Content ══════════════════════════════════════════════════════════ --%>
+<main class="flex-grow max-w-container-max mx-auto px-md pt-[104px] pb-xl w-full">
+  <%!-- ─── Page heading ──────────────────────────────────────────────────────── --%>
+  <section class="mb-lg">
+    <div>
+      <h1 class="font-h1 text-h1 font-extrabold text-on-surface mb-xs">
+        <span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-lg mr-sm">
+          {@topic_name}
+        </span>
+      </h1>
+      <p class="font-prose-body text-prose-body text-on-surface-variant">
+        {@post_count} {if @post_count == 1, do: "post", else: "posts"} with this topic
+      </p>
+    </div>
+  </section>
+
+  <%!-- ─── Bento article grid ───────────────────────────────────────────────── --%>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+    <%= if Enum.empty?(@posts) do %>
+      <div class="col-span-full flex flex-col items-center justify-center py-xl">
+        <span class="material-symbols-outlined text-[48px] text-outline-variant mb-md">
+          article
+        </span>
+        <h2 class="font-h3 text-h3 text-on-surface mb-sm">No posts yet</h2>
+        <p class="font-ui-body text-ui-body text-on-surface-variant mb-lg">
+          Be the first to share something with this topic!
+        </p>
+        <.link href={~p"/posts/new"} class="btn btn-primary">
+          Write a Post
+        </.link>
+      </div>
+    <% else %>
+      <%= for {post, like_count} <- @posts do %>
+        <article class="relative bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest hover:shadow-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col h-full group">
+          <div class="p-sm flex-1 flex flex-col justify-between bg-surface-container-low">
+            <div>
+              <div class="relative z-10 flex flex-wrap gap-xs mb-sm">
+                <%= for topic <- post.topics do %>
+                  <.link
+                    href={~p"/topics/#{topic.id}"}
+                    class="bg-secondary-container text-on-secondary-container font-ui-label text-ui-label font-semibold px-xs py-[2px] rounded uppercase text-[10px] tracking-wider hover:opacity-80 transition-opacity"
+                  >
+                    {topic.name}
+                  </.link>
+                <% end %>
+              </div>
+
+              <div class="relative">
+                <.link
+                  href={~p"/posts/#{post.id}"}
+                  class="absolute inset-0 z-0"
+                  aria-label={"View post: #{post.title}"}
+                >
+                </.link>
+                <h3 class="font-h3 text-h3 font-semibold text-on-surface mb-xs group-hover:text-primary transition-colors line-clamp-2">
+                  {post.title}
+                </h3>
+                <p class="font-ui-body text-ui-body text-on-surface-variant line-clamp-4 mb-sm">
+                  {String.slice(post.body, 0, 150)}...
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-sm mt-auto relative z-10">
+              <div class="flex items-center gap-xs">
+                <div class="w-6 h-6 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-xs font-bold">
+                  {String.first(post.user.email)}
+                </div>
+                <span class="font-ui-label text-ui-label font-semibold text-on-surface">
+                  {String.split(post.user.email, "@") |> List.first()}
+                </span>
+                <span class="text-outline text-[12px]">
+                  {Calendar.strftime(post.published_at || post.inserted_at, "%b %d")}
+                </span>
+              </div>
+              <span class="text-outline text-[12px] flex items-center gap-xs">
+                <span class="material-symbols-outlined text-[14px]">visibility</span>
+                {post.view_count}
+              </span>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    <% end %>
+  </div>
+</main>
+
+<%!-- ═══ Footer ══════════════════════════════════════════════════════════════ --%>
+<footer class="w-full border-t border-outline-variant bg-surface-container-lowest">
+  <div class="max-w-container-max mx-auto px-md py-lg flex flex-col md:flex-row justify-between items-center gap-sm">
+    <span class="font-ui-body text-ui-body text-on-surface-variant opacity-80 hover:opacity-100 transition-opacity">
+      &copy; {Date.utc_today().year} DevWrite. Crafted for the modern engineer.
+    </span>
+  </div>
+</footer>
