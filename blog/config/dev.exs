@@ -57,6 +57,26 @@ config :blog, BlogWeb.Endpoint,
 
 config :blog, Blog.Mailer, adapter: Swoosh.Adapters.Local
 
+# To test email delivery locally with Gmail SMTP, set environment variables:
+# SMTP_USERNAME=your-email@gmail.com
+# SMTP_PASSWORD=your-app-password
+# MAILER_FROM=your-email@gmail.com
+# Then configure SMTP adapter instead of Local:
+if System.get_env("SMTP_PASSWORD") do
+  config :blog, Blog.Mailer,
+    adapter: Swoosh.Adapters.SMTP,
+    relay: "smtp.gmail.com",
+    username: System.get_env("SMTP_USERNAME"),
+    password: System.get_env("SMTP_PASSWORD"),
+    port: 587,
+    ssl: false,
+    tls: :always,
+    auth: :always,
+    retries: 1
+end
+
+config :blog, :mail, from: System.get_env("MAILER_FROM") || "contact@example.com"
+
 # Reload browser tabs when matching files change.
 config :blog, BlogWeb.Endpoint,
   live_reload: [

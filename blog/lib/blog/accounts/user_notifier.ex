@@ -129,7 +129,10 @@ defmodule Blog.Accounts.UserNotifier do
 
   # Delivers the email using the application mailer.
   defp deliver(recipient, subject, body) do
-    from_email = Application.get_env(:blog, :mail)[:from] || "contact@example.com"
+    require Logger
+
+    mail_config = Application.get_env(:blog, :mail) || []
+    from_email = mail_config[:from] || "contact@example.com"
 
     email =
       new()
@@ -138,8 +141,14 @@ defmodule Blog.Accounts.UserNotifier do
       |> subject(subject)
       |> text_body(body)
 
-    with {:ok, _metadata} <- Mailer.deliver(email) do
-      {:ok, email}
+    case Mailer.deliver(email) do
+      {:ok, metadata} ->
+        Logger.info("Email sent successfully to #{recipient}: #{subject}")
+        {:ok, email}
+
+      {:error, reason} ->
+        Logger.error("Failed to deliver email to #{recipient}: #{inspect(reason)}")
+        {:error, reason}
     end
   end
 

@@ -38,6 +38,9 @@ config :blog, BlogWeb.Endpoint,
 
 config :blog, Blog.Mailer, adapter: Swoosh.Adapters.Local
 
+# Default email configuration (from address)
+config :blog, :mail, from: "contact@example.com"
+
 # Configures the API client for Swoosh
 config :swoosh, :api_client, Swoosh.ApiClient.Hackney
 
