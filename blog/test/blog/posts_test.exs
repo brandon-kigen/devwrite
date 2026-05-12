@@ -170,6 +170,51 @@ defmodule Blog.PostsTest do
     end
   end
 
+  describe "search and filters" do
+    setup do
+      user = user_fixture()
+      post1 = post_fixture(user: user, title: "Elixir rocks", topics: ["elixir"])
+      post2 = post_fixture(user: user, title: "Phoenix is fast", topics: ["phoenix"])
+      topic_elixir = Enum.find(post1.topics, &(&1.name == "elixir"))
+      %{user: user, post1: post1, post2: post2, topic_elixir: topic_elixir}
+    end
+
+    test "search_posts/1 returns matching posts", %{post1: post1, post2: post2} do
+      assert [p] = Posts.search_posts("Elixir")
+      assert p.id == post1.id
+
+      assert [p] = Posts.search_posts("fast")
+      assert p.id == post2.id
+
+      assert Posts.search_posts("nonexistent") == []
+      assert length(Posts.search_posts("")) == 2
+    end
+
+    test "filter_posts_by_topic/1 returns posts for topic", %{post1: post1, topic_elixir: topic} do
+      assert [p] = Posts.filter_posts_by_topic(topic.id)
+      assert p.id == post1.id
+
+      assert Posts.filter_posts_by_topic(9999) == []
+    end
+
+    test "search_and_filter_posts/2 handles combinations", %{post1: post1, topic_elixir: topic} do
+      # Both
+      assert [p] = Posts.search_and_filter_posts("Elixir", topic.id)
+      assert p.id == post1.id
+
+      # Only query
+      assert [p] = Posts.search_and_filter_posts("Elixir", nil)
+      assert p.id == post1.id
+
+      # Only topic
+      assert [p] = Posts.search_and_filter_posts(nil, topic.id)
+      assert p.id == post1.id
+
+      # None
+      assert length(Posts.search_and_filter_posts(nil, nil)) == 2
+    end
+  end
+
   # Helper for draft fixture
   defp draft_fixture(user) do
     draft_post_fixture(user: user)

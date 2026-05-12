@@ -46,7 +46,7 @@ defmodule BlogWeb.UserLive.RegistrationTest do
         render_submit(form)
         |> follow_redirect(conn, ~p"/users/log-in")
 
-      assert html =~ "Account created! Sign in to continue."
+      assert html =~ "Account created! Check your email for login instructions."
     end
 
     test "renders errors for duplicated email", %{conn: conn} do

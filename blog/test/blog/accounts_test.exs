@@ -25,12 +25,14 @@ defmodule Blog.AccountsTest do
 
     test "returns error if the password is not valid" do
       user = user_fixture() |> set_password()
+
       assert Accounts.get_user_by_email_and_password(user.email, "invalid") ==
                {:error, :unauthorized}
     end
 
     test "returns error if the user is not confirmed" do
       {:ok, user} = Accounts.register_user(valid_user_attributes())
+
       assert Accounts.get_user_by_email_and_password(user.email, valid_user_password()) ==
                {:error, :unconfirmed}
     end

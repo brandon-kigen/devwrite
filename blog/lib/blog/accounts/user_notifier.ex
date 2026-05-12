@@ -142,7 +142,7 @@ defmodule Blog.Accounts.UserNotifier do
       |> text_body(body)
 
     case Mailer.deliver(email) do
-      {:ok, metadata} ->
+      {:ok, _metadata} ->
         Logger.info("Email sent successfully to #{recipient}: #{subject}")
         {:ok, email}
 

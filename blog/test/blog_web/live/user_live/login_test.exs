@@ -16,7 +16,7 @@ defmodule BlogWeb.UserLive.LoginTest do
 
   describe "user login - password" do
     test "redirects to feed if user logs in with valid credentials", %{conn: conn} do
-      user = user_fixture() |> set_password()
+      user = user_fixture()
 
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
 
@@ -50,6 +50,20 @@ defmodule BlogWeb.UserLive.LoginTest do
     test "register link points to the registration page", %{conn: conn} do
       {:ok, _lv, html} = live(conn, ~p"/users/log-in")
       assert html =~ ~p"/users/register"
+    end
+  end
+
+  describe "user login - magic link" do
+    test "sends magic link instructions", %{conn: conn} do
+      user = user_fixture()
+      # Recycle and clear session to avoid "already logged in" redirect from setup
+      conn = conn |> recycle() |> init_test_session(%{})
+      {:ok, lv, _html} = live(conn, ~p"/users/log-in")
+
+      lv
+      |> render_submit("submit_magic", %{user: %{email: user.email}})
+
+      assert_redirect(lv, ~p"/users/log-in")
     end
   end
 

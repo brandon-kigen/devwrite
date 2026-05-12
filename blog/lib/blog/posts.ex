@@ -98,9 +98,9 @@ defmodule Blog.Posts do
   Extracts topics from attrs as a list, creates/finds topics, and links them.
   """
   def create_post(%User{} = user, attrs \\ %{}) do
-    # Extract topics before creating post
-    topics = Map.get(attrs, "topics", []) || []
-    attrs_without_topics = Map.delete(attrs, "topics")
+    # Extract topics before creating post - handle both string and atom keys
+    topics = Map.get(attrs, "topics") || Map.get(attrs, :topics) || []
+    attrs_without_topics = attrs |> Map.delete("topics") |> Map.delete(:topics)
 
     changeset =
       %Post{}
@@ -124,8 +124,8 @@ defmodule Blog.Posts do
   """
   def update_post(%User{} = user, %Post{} = post, attrs) do
     if post.user_id == user.id do
-      topics = Map.get(attrs, "topics", []) || []
-      attrs_without_topics = Map.delete(attrs, "topics")
+      topics = Map.get(attrs, "topics") || Map.get(attrs, :topics) || []
+      attrs_without_topics = attrs |> Map.delete("topics") |> Map.delete(:topics)
 
       case post
            |> Post.changeset(sanitize_post_attrs(attrs_without_topics))

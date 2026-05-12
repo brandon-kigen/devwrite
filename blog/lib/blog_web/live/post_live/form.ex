@@ -364,7 +364,7 @@ defmodule BlogWeb.PostLive.Form do
                   phx-hook="TrixEditor"
                   data-input-id="post_body"
                 >
-                  <input id="post_body" type="hidden" name="post[body]" value={@form_body} />
+                  <textarea id="post_body" name="post[body]" class="hidden">{@form_body}</textarea>
                   <trix-editor
                     input="post_body"
                     class="trix-content rounded-lg border border-outline-variant bg-surface text-on-surface font-prose-body min-h-[300px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary px-md py-sm"
