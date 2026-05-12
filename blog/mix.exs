@@ -66,6 +66,7 @@ defmodule Blog.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:swoosh, "~> 1.4"},
+      {:gen_smtp, "~> 1.2"},
       {:hackney, "~> 1.9"},
       {:html_sanitize_ex, "~> 1.4"}
     ]

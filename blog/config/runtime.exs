@@ -53,11 +53,18 @@ if config_env() == :prod do
     http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: port],
     secret_key_base: secret_key_base
 
-  # Mailer configuration for production using Resend API
-  if System.get_env("RESEND_API_KEY") do
+  # Mailer configuration for production using Gmail SMTP
+  if System.get_env("SMTP_PASSWORD") do
     config :blog, Blog.Mailer,
-      adapter: Swoosh.Adapters.Resend,
-      api_key: System.get_env("RESEND_API_KEY")
+      adapter: Swoosh.Adapters.SMTP,
+      relay: "smtp.gmail.com",
+      username: System.get_env("SMTP_USERNAME"),
+      password: System.get_env("SMTP_PASSWORD"),
+      port: 587,
+      ssl: false,
+      tls: :always,
+      auth: :always,
+      retries: 1
   end
 
   config :blog, :mail, from: System.get_env("MAILER_FROM") || "contact@example.com"
