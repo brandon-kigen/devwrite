@@ -295,7 +295,9 @@ defmodule BlogWeb.UserLive.Registration do
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
-        case Accounts.deliver_login_instructions(user, fn token -> url(~p"/users/log-in/#{token}") end) do
+        case Accounts.deliver_login_instructions(user, fn token ->
+               url(~p"/users/log-in/#{token}")
+             end) do
           {:ok, _} ->
             {:noreply,
              socket
@@ -305,11 +307,27 @@ defmodule BlogWeb.UserLive.Registration do
           {:error, reason} ->
             require Logger
             Logger.error("Failed to send confirmation email to #{user.email}: #{inspect(reason)}")
+
             {:noreply,
              socket
-             |> put_flash(:error, "Account created, but we failed to send the confirmation email. Please try logging in.")
+             |> put_flash(
+               :error,
+               "Account created, but we failed to send the confirmation email. Please try logging in."
+             )
              |> push_navigate(to: ~p"/users/log-in")}
         end
+
+      {:error, :unconfirmed_expired, user} ->
+        # Send new link
+        Accounts.deliver_login_instructions(user, fn token -> url(~p"/users/log-in/#{token}") end)
+
+        {:noreply,
+         socket
+         |> put_flash(
+           :info,
+           "This email is already registered but was never confirmed. We've sent you a new confirmation link."
+         )
+         |> push_navigate(to: ~p"/users/log-in")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}

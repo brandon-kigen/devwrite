@@ -152,7 +152,7 @@ defmodule Blog.Accounts do
   @doc """
   Registers a user with email and password.
 
-  The account is confirmed immediately — no magic-link email is needed.
+  New accounts start as unconfirmed and require email verification.
 
   ## Examples
 
@@ -164,9 +164,17 @@ defmodule Blog.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
+    email = attrs["email"] || attrs[:email]
+    user = email && get_user_by_email(email)
+
+    if user && is_nil(user.confirmed_at) &&
+         DateTime.diff(DateTime.utc_now(), user.inserted_at, :minute) >= 15 do
+      {:error, :unconfirmed_expired, user}
+    else
+      %User{}
+      |> User.registration_changeset(attrs)
+      |> Repo.insert()
+    end
   end
 
   ## Settings

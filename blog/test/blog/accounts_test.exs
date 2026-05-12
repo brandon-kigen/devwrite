@@ -85,7 +85,7 @@ defmodule Blog.AccountsTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
-    test "registers users with a hashed password and confirms them immediately" do
+    test "registers users with a hashed password but as unconfirmed" do
       email = unique_user_email()
       {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
       assert user.email == email
@@ -98,6 +98,17 @@ defmodule Blog.AccountsTest do
     test "requires password" do
       {:error, changeset} = Accounts.register_user(%{email: unique_user_email()})
       assert %{password: ["can't be blank"]} = errors_on(changeset)
+    end
+
+    test "returns :unconfirmed_expired if user exists but is unconfirmed and old" do
+      {:ok, user} = Accounts.register_user(valid_user_attributes())
+      # Set inserted_at to 20 minutes ago
+      Repo.update_all(from(u in User, where: u.id == ^user.id),
+        set: [inserted_at: DateTime.add(DateTime.utc_now(), -20, :minute)]
+      )
+
+      assert {:error, :unconfirmed_expired, _user} =
+               Accounts.register_user(valid_user_attributes(email: user.email))
     end
 
     test "validates password length" do
