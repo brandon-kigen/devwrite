@@ -68,6 +68,20 @@ defmodule BlogWeb.UserSessionControllerTest do
       assert Phoenix.Flash.get(conn.assigns.flash, :error) == "Invalid email or password"
       assert redirected_to(conn) == ~p"/users/log-in"
     end
+
+    test "redirects to login page when user is not confirmed", %{conn: conn} do
+      {:ok, user} = Accounts.register_user(valid_user_attributes())
+
+      conn =
+        post(conn, ~p"/users/log-in", %{
+          "user" => %{"email" => user.email, "password" => valid_user_password()}
+        })
+
+      assert Phoenix.Flash.get(conn.assigns.flash, :error) ==
+               "Please confirm your email address before logging in."
+
+      assert redirected_to(conn) == ~p"/users/log-in"
+    end
   end
 
   describe "POST /users/log-in - magic link" do
