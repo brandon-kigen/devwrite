@@ -53,24 +53,16 @@ if config_env() == :prod do
     http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: port],
     secret_key_base: secret_key_base
 
-  # Mailer configuration for production using Gmail SMTP
-  smtp_username = System.get_env("SMTP_USERNAME")
-  smtp_password = System.get_env("SMTP_PASSWORD")
+  # Mailer configuration for production using Brevo API
+  brevo_api_key = System.get_env("BREVO_API_KEY")
   mailer_from = System.get_env("MAILER_FROM") || "contact@example.com"
 
-  if smtp_password && smtp_username do
+  if brevo_api_key do
     config :blog, Blog.Mailer,
-      adapter: Swoosh.Adapters.SMTP,
-      relay: "smtp.gmail.com",
-      username: smtp_username,
-      password: smtp_password,
-      port: 587,
-      ssl: false,
-      tls: :always,
-      auth: :always,
-      retries: 1
+      adapter: Swoosh.Adapters.Brevo,
+      api_key: brevo_api_key
   else
-    # Fallback to local adapter if SMTP credentials not provided
+    # Fallback to local adapter if API key is not provided
     config :blog, Blog.Mailer, adapter: Swoosh.Adapters.Local
   end
 
