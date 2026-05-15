@@ -111,6 +111,11 @@ defmodule Blog.Posts do
       {:ok, post} ->
         # Create topic associations
         post = create_post_topics(post, topics)
+        Phoenix.PubSub.broadcast(
+          Blog.PubSub,
+          "post",
+          {:new_post, post}
+        )
         {:ok, post}
 
       {:error, changeset} ->
@@ -331,15 +336,7 @@ defmodule Blog.Posts do
   Returns posts with that topic, with topics and user preloaded.
   """
   def filter_posts_by_topic(topic_id) when is_integer(topic_id) and topic_id > 0 do
-    Post
-    |> join(:inner, [p], pt in PostsTopic, on: p.id == pt.post_id)
-    |> join(:inner, [_, pt], t in Topic, on: pt.topic_id == t.id)
-    |> where([p], not is_nil(p.published_at))
-    |> where([_, _, t], t.id == ^topic_id)
-    |> order_by([p], desc: p.inserted_at)
-    |> preload([:user, :topics])
-    |> distinct(true)
-    |> Repo.all()
+    search_and_filter_posts("", topic_id)
   end
 
   def filter_posts_by_topic(_topic_id) do
@@ -358,22 +355,23 @@ defmodule Blog.Posts do
     base_query =
       Post
       |> where([p], not is_nil(p.published_at))
+      |> join(:left, [p], l in assoc(p, :likes))
+      |> group_by([p], p.id)
       |> order_by([p], desc: p.inserted_at)
+      |> select([p, l], {p, count(l.id)})
       |> preload([:user, :topics])
 
     query =
       if search_term do
-        base_query
-        |> where([p], ilike(p.title, ^search_term))
+        base_query |> where([p, l], ilike(p.title, ^search_term))
       else
         base_query
       end
 
     if use_topic_filter do
       query
-      |> join(:inner, [p], pt in PostsTopic, on: p.id == pt.post_id)
-      |> where([_, pt], pt.topic_id == ^topic_id)
-      |> distinct(true)
+      |> join(:inner, [p, l], pt in PostsTopic, on: p.id == pt.post_id)
+      |> where([p, l, pt], pt.topic_id == ^topic_id)
       |> Repo.all()
     else
       Repo.all(query)

@@ -191,23 +191,23 @@ defmodule Blog.PostsTest do
     end
 
     test "filter_posts_by_topic/1 returns posts for topic", %{post1: post1, topic_elixir: topic} do
-      assert [p] = Posts.filter_posts_by_topic(topic.id)
+      assert [{p, _count}] = Posts.filter_posts_by_topic(topic.id)
       assert p.id == post1.id
 
-      assert Posts.filter_posts_by_topic(9999) == []
+      assert Posts.filter_posts_by_topic(999_999) == []
     end
 
     test "search_and_filter_posts/2 handles combinations", %{post1: post1, topic_elixir: topic} do
       # Both
-      assert [p] = Posts.search_and_filter_posts("Elixir", topic.id)
+      assert [{p, _count}] = Posts.search_and_filter_posts("Elixir", topic.id)
       assert p.id == post1.id
 
       # Only query
-      assert [p] = Posts.search_and_filter_posts("Elixir", nil)
+      assert [{p, _count}] = Posts.search_and_filter_posts("Elixir", nil)
       assert p.id == post1.id
 
       # Only topic
-      assert [p] = Posts.search_and_filter_posts(nil, topic.id)
+      assert [{p, _count}] = Posts.search_and_filter_posts(nil, topic.id)
       assert p.id == post1.id
 
       # None

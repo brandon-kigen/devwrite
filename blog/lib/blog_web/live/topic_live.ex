@@ -19,8 +19,8 @@ defmodule BlogWeb.TopicLive do
   @impl true
   def mount(%{"id" => topic_id_str}, _session, socket) do
     topic_id = String.to_integer(topic_id_str)
-    posts = Posts.filter_posts_by_topic(topic_id)
-    posts_with_likes = Enum.map(posts, fn post -> {post, Posts.like_count(post.id)} end)
+    posts_with_likes = Posts.filter_posts_by_topic(topic_id)
+    posts = Enum.map(posts_with_likes, fn {p, _} -> p end)
 
     case posts do
       [] ->

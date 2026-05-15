@@ -38,13 +38,10 @@ defmodule BlogWeb.FeedLive do
   - `current_scope.user` always available
   - User is guaranteed to be loaded
 
-  ## View Count
-
   Like counts are computed at load time:
-  - Posts enumerated with `Posts.like_count/1`
-  - Paired with post: {post, like_count}
-  - Passed to template for rendering
-  - Not real-time (would need PubSub to update on likes)
+  - Fetched via SQL join/aggregate in `Posts.search_and_filter_posts/2`
+  - Returns: {post, like_count} tuples
+  - Efficiently handles N+1 query problem
 
   ## Events
 
@@ -70,8 +67,8 @@ defmodule BlogWeb.FeedLive do
       |> String.upcase()
 
     # Get initial posts and all topics
-    posts = Posts.search_and_filter_posts("", nil)
-    posts_with_likes = Enum.map(posts, fn post -> {post, Posts.like_count(post.id)} end)
+    # No longer suffers from N+1 queries - like counts are joined in SQL
+    posts_with_likes = Posts.search_and_filter_posts("", nil)
     all_topics = Posts.list_all_topics()
 
     {:ok,
@@ -87,6 +84,26 @@ defmodule BlogWeb.FeedLive do
   end
 
   @impl true
+  def handle_info({:new_post, _post}, socket) do
+    posts_with_likes = Posts.search_and_filter_posts("", nil)
+    {:noreply,
+     socket
+     |> assign(:posts, posts_with_likes)
+    }
+  end
+
+  @impl true
+  def handle_params(_params, _url, socket) do
+    if connected?(socket) do
+      # Subscribe to post updates (view count is now tracked via client-side hook)
+      Phoenix.PubSub.subscribe(Blog.PubSub, "post")
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
   def handle_event("toggle_profile", _params, socket) do
     {:noreply, assign(socket, :profile_open, !socket.assigns.profile_open)}
   end
@@ -99,8 +116,7 @@ defmodule BlogWeb.FeedLive do
   @impl true
   def handle_event("search", %{"query" => query}, socket) do
     # Decouple: search resets topic filter
-    posts = Posts.search_and_filter_posts(query, nil)
-    posts_with_likes = Enum.map(posts, fn post -> {post, Posts.like_count(post.id)} end)
+    posts_with_likes = Posts.search_and_filter_posts(query, nil)
 
     {:noreply,
      socket
@@ -113,8 +129,7 @@ defmodule BlogWeb.FeedLive do
   def handle_event("filter_topic", %{"topic_id" => topic_id_str}, socket) do
     # Decouple: topic filter resets search
     topic_id = if topic_id_str == "", do: nil, else: String.to_integer(topic_id_str)
-    posts = Posts.search_and_filter_posts("", topic_id)
-    posts_with_likes = Enum.map(posts, fn post -> {post, Posts.like_count(post.id)} end)
+    posts_with_likes = Posts.search_and_filter_posts("", topic_id)
 
     {:noreply,
      socket
@@ -125,8 +140,7 @@ defmodule BlogWeb.FeedLive do
 
   @impl true
   def handle_event("clear_filters", _params, socket) do
-    posts = Posts.search_and_filter_posts("", nil)
-    posts_with_likes = Enum.map(posts, fn post -> {post, Posts.like_count(post.id)} end)
+    posts_with_likes = Posts.search_and_filter_posts("", nil)
 
     {:noreply,
      socket
