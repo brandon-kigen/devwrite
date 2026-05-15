@@ -111,11 +111,13 @@ defmodule Blog.Posts do
       {:ok, post} ->
         # Create topic associations
         post = create_post_topics(post, topics)
+
         Phoenix.PubSub.broadcast(
           Blog.PubSub,
           "post",
           {:new_post, post}
         )
+
         {:ok, post}
 
       {:error, changeset} ->

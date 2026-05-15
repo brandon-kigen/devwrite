@@ -86,10 +86,10 @@ defmodule BlogWeb.FeedLive do
   @impl true
   def handle_info({:new_post, _post}, socket) do
     posts_with_likes = Posts.search_and_filter_posts("", nil)
+
     {:noreply,
      socket
-     |> assign(:posts, posts_with_likes)
-    }
+     |> assign(:posts, posts_with_likes)}
   end
 
   @impl true
