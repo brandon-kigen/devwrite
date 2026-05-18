@@ -89,6 +89,9 @@ defmodule BlogWeb do
       # Core UI components
       import BlogWeb.CoreComponents
 
+      # Import slugify and post_slug for URL generation
+      import Blog.Posts, only: [slugify: 1, post_slug: 1]
+
       # Common modules used in templates
       alias Phoenix.LiveView.JS
       alias BlogWeb.Layouts

@@ -153,10 +153,12 @@ defmodule BlogWeb.PostLiveTest do
       conn = log_in_user(conn, user)
       {:ok, form_live, _html} = live(conn, ~p"/posts/#{post.id}/edit")
 
+      expected_path = "/posts/#{post.id}-updated-title"
+
       assert form_live
              |> form("form[phx-submit=\"save\"]", post: %{title: "updated title"})
              |> render_submit()
-             |> follow_redirect(conn, ~p"/posts/#{post.id}")
+             |> follow_redirect(conn, expected_path)
 
       assert Blog.Posts.get_post!(post.id).title == "updated title"
     end

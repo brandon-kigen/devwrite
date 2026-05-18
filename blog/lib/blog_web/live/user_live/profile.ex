@@ -154,7 +154,7 @@ defmodule BlogWeb.UserLive.Profile do
 
             <%!-- Most Viewed Post --%>
             <%= if @most_viewed_post do %>
-              <.link href={~p"/posts/#{@most_viewed_post.id}"} class="sm:col-span-2 group">
+              <.link href={~p"/posts/#{post_slug(@most_viewed_post)}"} class="sm:col-span-2 group">
                 <div class="bg-primary text-on-primary rounded-xl shadow-rest p-lg relative overflow-hidden flex flex-col justify-center min-h-[160px] hover:shadow-hover transition-all">
                   <div class="absolute top-0 right-0 p-md opacity-20">
                     <span class="material-symbols-outlined text-6xl">trending_up</span>
@@ -197,7 +197,7 @@ defmodule BlogWeb.UserLive.Profile do
           <% else %>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
               <%= for {post, like_count} <- @posts do %>
-                <.link href={~p"/posts/#{post.id}"} class="group">
+                <.link href={~p"/posts/#{post_slug(post)}"} class="group">
                   <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-rest hover:shadow-hover transition-all duration-200 p-lg flex flex-col h-full">
                     <div class="flex-1">
                       <div class="mb-md flex flex-wrap gap-xs">

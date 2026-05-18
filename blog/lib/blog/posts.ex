@@ -85,13 +85,41 @@ defmodule Blog.Posts do
 
   @doc """
   Gets a single post with user and comments preloaded.
+  Supports both raw numeric IDs and ID-slug strings (e.g. "42-post-title").
   """
-  def get_post!(id) do
+  def get_post!(id_or_slug) do
+    id =
+      case Integer.parse(to_string(id_or_slug)) do
+        {id, _suffix} -> id
+        :error -> id_or_slug
+      end
+
     Post
     |> where([p], p.id == ^id)
     |> preload([:user, :topics, comments: :user])
     |> Repo.one!()
   end
+
+  @doc """
+  Generates a URL-friendly slug from a post title.
+  """
+  def slugify(nil), do: ""
+  def slugify(title) when is_binary(title) do
+    title
+    |> String.downcase()
+    |> String.replace(~r/[^a-z0-9\s-]/, "")
+    |> String.replace(~r/[\s-]+/, "-")
+    |> String.trim("-")
+  end
+
+  @doc """
+  Generates the complete ID-slug segment for a post.
+  """
+  def post_slug(%{id: id, title: title}) do
+    "#{id}-#{slugify(title)}"
+  end
+
+
 
   @doc """
   Creates a post for a given user with topic associations.

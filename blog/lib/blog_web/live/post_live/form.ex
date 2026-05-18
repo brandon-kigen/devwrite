@@ -253,7 +253,7 @@ defmodule BlogWeb.PostLive.Form do
         {:noreply,
          socket
          |> put_flash(:info, message)
-         |> redirect(to: ~p"/posts/#{post.id}")}
+         |> redirect(to: ~p"/posts/#{Posts.post_slug(post)}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
@@ -271,7 +271,7 @@ defmodule BlogWeb.PostLive.Form do
         {:noreply,
          socket
          |> put_flash(:info, message)
-         |> redirect(to: ~p"/posts/#{post.id}")}
+         |> redirect(to: ~p"/posts/#{Posts.post_slug(post)}")}
 
       {:error, :unauthorized} ->
         {:noreply,
