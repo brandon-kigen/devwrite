@@ -18,7 +18,7 @@ defmodule BlogWeb do
   """
 
   @spec static_paths() :: [<<_::40, _::_*8>>, ...]
-  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
+  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt uploads)
 
   @spec router() :: {:__block__, [], [{:import, [...], [...]} | {:use, [...], [...]}, ...]}
   def router do

@@ -154,6 +154,7 @@ defmodule BlogWeb.Router do
     end
 
     post("/users/update-password", UserSessionController, :update_password)
+    post("/uploads", UploadController, :create)
   end
 
   # Public routes with optional authentication

@@ -92,6 +92,14 @@ const TrixEditor = {
       hiddenInput.value = e.target.value;
     });
 
+    // Handle Trix attachment uploads (e.g., drag-and-dropped images)
+    this.el.addEventListener("trix-attachment-add", (e) => {
+      const attachment = e.attachment;
+      if (attachment.file) {
+        uploadAttachment(attachment);
+      }
+    });
+
     // Set initial content if editing an existing post
     const editor = this.el.querySelector("trix-editor");
     if (
@@ -100,6 +108,42 @@ const TrixEditor = {
       !editor.editor.getDocument().toString().trim()
     ) {
       editor.editor.loadHTML(hiddenInput.value);
+    }
+
+    function uploadAttachment(attachment) {
+      const file = attachment.file;
+      const form = new FormData();
+      form.append("file", file);
+
+      const csrf = document
+        .querySelector("meta[name='csrf-token']")
+        .getAttribute("content");
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/uploads", true);
+      xhr.setRequestHeader("x-csrf-token", csrf);
+
+      xhr.upload.addEventListener("progress", (event) => {
+        const progress = (event.loaded / event.total) * 100;
+        attachment.setUploadProgress(progress);
+      });
+
+      xhr.addEventListener("load", () => {
+        if (xhr.status === 201) {
+          const response = JSON.parse(xhr.responseText);
+          attachment.setAttributes({
+            url: response.url
+          });
+        } else {
+          console.error("Trix upload failed with status:", xhr.status);
+        }
+      });
+
+      xhr.addEventListener("error", () => {
+        console.error("Trix upload network error");
+      });
+
+      xhr.send(form);
     }
   },
 };

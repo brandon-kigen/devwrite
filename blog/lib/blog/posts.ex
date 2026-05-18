@@ -104,6 +104,7 @@ defmodule Blog.Posts do
   Generates a URL-friendly slug from a post title.
   """
   def slugify(nil), do: ""
+
   def slugify(title) when is_binary(title) do
     title
     |> String.downcase()
@@ -118,8 +119,6 @@ defmodule Blog.Posts do
   def post_slug(%{id: id, title: title}) do
     "#{id}-#{slugify(title)}"
   end
-
-
 
   @doc """
   Creates a post for a given user with topic associations.

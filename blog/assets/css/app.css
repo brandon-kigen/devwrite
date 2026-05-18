@@ -301,3 +301,47 @@ trix-toolbar .trix-button.trix-active {
   background: var(--color-primary-container);
   color: var(--color-on-primary-container);
 }
+
+/* ─── Trix Image & Attachment Styling ────────────────────────────────────── */
+.prose-content img, .trix-content img, trix-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-card, 12px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin: var(--spacing-md) auto;
+  display: block;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.prose-content img:hover, .trix-content img:hover {
+  transform: scale(1.01);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.prose-content figure, .trix-content figure, trix-editor figure {
+  margin: var(--spacing-lg) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+}
+
+.prose-content figcaption, .trix-content figcaption, trix-editor figcaption {
+  font-size: 0.85rem;
+  color: var(--color-on-surface-variant);
+  opacity: 0.8;
+  font-family: var(--font-ui-label);
+  text-align: center;
+  margin-top: var(--spacing-xs);
+}
+
+/* Hide default filename and size metadata captions from Trix attachments */
+trix-editor .attachment__name,
+trix-editor .attachment__size,
+.prose-content .attachment__name,
+.prose-content .attachment__size,
+.trix-content .attachment__name,
+.trix-content .attachment__size {
+  display: none !important;
+}
